@@ -1,5 +1,20 @@
 #include "ReplicantHook.hpp"
 
+int ReplicantHook::gold(NULL);
+uintptr_t ReplicantHook::_baseAddress(NULL);
+DWORD ReplicantHook::_pID(NULL);
+uintptr_t ReplicantHook::actorPlayable(NULL);
+bool ReplicantHook::_hooked(NULL);
+std::string ReplicantHook::zone(NULL);
+std::string ReplicantHook::name(NULL);
+int ReplicantHook::health(NULL);
+float ReplicantHook::magic(NULL);
+int ReplicantHook::level(NULL);
+double ReplicantHook::playtime(NULL);
+float ReplicantHook::x(NULL);
+float ReplicantHook::y(NULL);
+float ReplicantHook::z(NULL);
+
 DWORD ReplicantHook::_getProcessID(void)
 {
 	//Search game window
@@ -47,37 +62,37 @@ uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName
 //Hook to NieR:Automata process
 void ReplicantHook::_hook(void)
 {
-	DWORD ID = this->_getProcessID();
+	DWORD ID = ReplicantHook::_getProcessID();
 	if (ID <= 0)
 		return;
-	this->_pID = ID;
-	this->_baseAddress = this->_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
-	this->_hooked = true;
+	ReplicantHook::_pID = ID;
+	ReplicantHook::_baseAddress = ReplicantHook::_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
+	ReplicantHook::_hooked = true;
 }
 //unHook NieR:Automata
 void ReplicantHook::_unHook(void)
 {
-	this->_hooked = false;
-	this->_pID = 0;
-	this->_baseAddress = 0;
-	this->actorPlayable = 0;
-	this->gold = 0;
-	this->zone = "";
-	this->name = "";
-	this->health = 0;
-	this->magic = 0.0f;
-	this->level = 0;
-	this->playtime = 0.0;
-	this->x = 0;
-	this->y = 0;
-	this->z = 0;
-	this->InfiniteHealth(false);
-	this->InfiniteMagic(false);
+	ReplicantHook::_hooked = false;
+	ReplicantHook::_pID = 0;
+	ReplicantHook::_baseAddress = 0;
+	ReplicantHook::actorPlayable = 0;
+	//ReplicantHook::gold = 0;
+	ReplicantHook::zone = "";
+	ReplicantHook::name = "";
+	ReplicantHook::health = 0;
+	ReplicantHook::magic = 0.0f;
+	ReplicantHook::level = 0;
+	ReplicantHook::playtime = 0.0;
+	ReplicantHook::x = 0;
+	ReplicantHook::y = 0;
+	ReplicantHook::z = 0;
+	ReplicantHook::InfiniteHealth(false);
+	ReplicantHook::InfiniteMagic(false);
 }
 
 void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
 {
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, this->_pID);
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
 	DWORD oldprotection;
 	VirtualProtectEx(pHandle, destination, size, PAGE_EXECUTE_READWRITE, &oldprotection);
 	WriteProcessMemory(pHandle, destination, src, size, nullptr);
@@ -89,8 +104,8 @@ void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
 std::string ReplicantHook::readMemoryString(uintptr_t address)
 {
 	char val[20];
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, this->_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(this->_baseAddress + address), &val, sizeof(val), NULL);
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
 	CloseHandle(pHandle); //Close handle to prevent memory leaks
 	return std::string(val);
 }
@@ -99,201 +114,179 @@ void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
 {
 	SIZE_T BytesToWrite = value.length() + 1;
 	SIZE_T BytesWritten;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, this->_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(this->_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
-}
-
-ReplicantHook::ReplicantHook()
-{
-	this->_hooked = false;
-	this->_baseAddress = 0;
-	this->actorPlayable = 0;
-	this->_pID = 0;
-	this->gold = 0;
-	this->health = 0;
-	this->level = 0;
-	this->magic = 0.0f;
-	this->playtime = 0.0;
-	this->x = 0;
-	this->y = 0;
-	this->z = 0;
-	this->zone = "";
-	this->name = "";
-}
-
-ReplicantHook::~ReplicantHook()
-{
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
 }
 
 DWORD ReplicantHook::getProcessID(void)
 {
-	return this->_pID;
+	return ReplicantHook::_pID;
 }
 
 uintptr_t ReplicantHook::getBaseAddress(void)
 {
-	return this->_baseAddress;
+	return ReplicantHook::_baseAddress;
 }
 
 void ReplicantHook::start(void)
 {
-	this->_hook();
+	ReplicantHook::_hook();
 }
 
 void ReplicantHook::stop(void)
 {
-	this->_unHook();
+	ReplicantHook::_unHook();
 }
 
 void ReplicantHook::hookStatus(void)
 {
-	if (this->_pID != this->_getProcessID())
+	if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
 	{
-		this->_unHook();
+		ReplicantHook::_unHook();
 	}
 }
 
 void ReplicantHook::update()
 {
-	this->actorPlayable = readMemory <uintptr_t>(0x26F72D0);
-	this->gold = readMemory<int>(0x437284C);
-	this->zone = readMemoryString(0x4372794);
-	this->name = readMemoryString(0x43727BC);
-	this->health = readMemory<int>(0x43727DC);
-	this->magic = readMemory<float>(0x43727E8);
-	this->level = readMemory<int>(0x43727F4);
-	this->playtime = readMemory<double>(0x4372C30);
-	this->x = readMemory<float>((uintptr_t)this->actorPlayable + 0x9C);
-	this->y = readMemory<float>((uintptr_t)this->actorPlayable + 0xAC);
-	this->z = readMemory<float>((uintptr_t)this->actorPlayable + 0xBC);
+	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D0);
+	ReplicantHook::gold = readMemory<int>(0x437284C);
+	ReplicantHook::zone = readMemoryString(0x4372794);
+	ReplicantHook::name = readMemoryString(0x43727BC);
+	ReplicantHook::health = readMemory<int>(0x43727DC);
+	ReplicantHook::magic = readMemory<float>(0x43727E8);
+	ReplicantHook::level = readMemory<int>(0x43727F4);
+	ReplicantHook::playtime = readMemory<double>(0x4372C30);
+	ReplicantHook::x = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
+	ReplicantHook::y = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
+	ReplicantHook::z = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
 }
 
 bool ReplicantHook::isHooked(void)
 {
-	return this->_hooked;
+	return ReplicantHook::_hooked;
 }
 
 int ReplicantHook::getGold()
 {
-	return this->gold;
+	return ReplicantHook::gold;
 }
 
 std::string ReplicantHook::getZone()
 {
-	return this->zone;
+	return ReplicantHook::zone;
 }
 
 std::string ReplicantHook::getName()
 {
-	return this->name;
+	return ReplicantHook::name;
 }
 
 int ReplicantHook::getHealth()
 {
-	return this->health;
+	return ReplicantHook::health;
 }
 
 float ReplicantHook::getMagic()
 {
-	return this->magic;
+	return ReplicantHook::magic;
 }
 
 int ReplicantHook::getLevel()
 {
-	return this->level;
+	return ReplicantHook::level;
 }
 
 double ReplicantHook::getPlaytime()
 {
-	return this->playtime;
+	return ReplicantHook::playtime;
 }
 
 float ReplicantHook::getX()
 {
-	return this->x;
+	return ReplicantHook::x;
 }
 
 float ReplicantHook::getY()
 {
-	return this->y;
+	return ReplicantHook::y;
 }
 
 float ReplicantHook::getZ()
 {
-	return this->z;
+	return ReplicantHook::z;
 }
 
 void ReplicantHook::setGold(int value)
 {
-	this->writeMemory(0x437284C, value);
+	ReplicantHook::writeMemory(0x437284C, value);
 }
 
 void ReplicantHook::setZone(std::string value)
 {
-	this->writeMemoryString(0x4372794, value);
+	ReplicantHook::writeMemoryString(0x4372794, value);
 }
 
 void ReplicantHook::setName(std::string value)
 {
-	this->writeMemoryString(0x43727BC, value);
+	ReplicantHook::writeMemoryString(0x43727BC, value);
 }
 
 void ReplicantHook::setHealth(int value)
 {
-	this->writeMemory(0x43727DC, value);
+	ReplicantHook::writeMemory(0x43727DC, value);
 }
 
 void ReplicantHook::setMagic(float value)
 {
-	this->writeMemory(0x43727E8, value);
+	ReplicantHook::writeMemory(0x43727E8, value);
 }
 
 void ReplicantHook::setLevel(int value)
 {
-	this->writeMemory(0x43727F4, value);
+	ReplicantHook::writeMemory(0x43727F4, value);
 }
 
 void ReplicantHook::setPlaytime(double value)
 {
-	this->writeMemory(0x4372C30, value);
+	ReplicantHook::writeMemory(0x4372C30, value);
 }
 
 void ReplicantHook::setX(float value)
 {
-	this->writeMemory(this->actorPlayable + 0x9C, value);
+	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0x9C, value);
 }
 
 void ReplicantHook::setY(float value)
 {
-	this->writeMemory(this->actorPlayable + 0xAC, value);
+	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0xAC, value);
 }
 
 void ReplicantHook::setZ(float value)
 {
-	this->writeMemory(this->actorPlayable + 0xBC, value);
+	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0xBC, value);
 }
 
 void ReplicantHook::setPosition(float x, float y, float z)
 {
-	this->setX(x);
-	this->setY(y);
-	this->setZ(z);
+	ReplicantHook::setX(x);
+	ReplicantHook::setY(y);
+	ReplicantHook::setZ(z);
 }
 
 void ReplicantHook::InfiniteHealth(bool enabled)
 {
 	if (enabled)
-		_patch((BYTE*)(this->_baseAddress + 0x5D106DD), (BYTE*)"\x90\x90\x90\x90", 4);
+		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x5D106DD), (BYTE*)"\x90\x90\x90\x90", 4);
 	else
-		_patch((BYTE*)(this->_baseAddress + 0x5D106DD), (BYTE*)"\x89\x44\x81\x4C", 4);
+		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x5D106DD), (BYTE*)"\x89\x44\x81\x4C", 4);
 }
 
 void ReplicantHook::InfiniteMagic(bool enabled)
 {
 	if (enabled)
-		_patch((BYTE*)(this->_baseAddress + 0x3BDB5E), (BYTE*)"\x90\x90\x90\x90\x90\x90", 6);
+		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3BDB5E), (BYTE*)"\x90\x90\x90\x90\x90\x90", 6);
 	else
-		_patch((BYTE*)(this->_baseAddress + 0x3BDB5E), (BYTE*)"\xF3\x0F\x11\x54\x81\x58", 6);
+		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3BDB5E), (BYTE*)"\xF3\x0F\x11\x54\x81\x58", 6);
 }
 
 constexpr unsigned int str2int(const char* str, int h = 0)
@@ -336,7 +329,7 @@ void ReplicantHook::setActorModel(std::string model)
 		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; //default nierB
 		break;
 	}
-	this->_patch((BYTE*)(this->_baseAddress + 0x0B88280), modelBytes, 7);
+	ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x0B88280), modelBytes, 7);
 }
 
 std::string ReplicantHook::getActorModel()

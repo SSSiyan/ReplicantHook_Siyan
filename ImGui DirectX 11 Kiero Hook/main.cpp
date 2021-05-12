@@ -69,12 +69,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::NewFrame();
 
 	ImGui::Begin("ImGui Window");
-	//ImGui::SliderInt("Gold", &ReplicantHook::setGold);
-	//ImGui::Checkbox("Infinite Health", &ReplicantHook::InfiniteHealth);
-	ImGui::Text("Test");
-	if (ImGui::Button("InfiniteHP"))
+
+	ImGui::SliderInt("Gold Amount", &ReplicantHook::gold, 0, 10000);
+
+	if (ImGui::Button("Set Gold"))
 	{
-		&ReplicantHook::InfiniteHealth;
+		ReplicantHook::setGold(ReplicantHook::gold);
 	}
 
 	ImGui::End();
