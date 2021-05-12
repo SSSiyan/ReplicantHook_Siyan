@@ -29,17 +29,17 @@ public:
 	static void _unHook(void);
 	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 	template <typename T>
-	T readMemory(uintptr_t address);
+	static T readMemory(uintptr_t address);
 	template <typename T>
 	static void writeMemory(uintptr_t address, T value);
 	static std::string readMemoryString(uintptr_t address);
 	static void writeMemoryString(uintptr_t address, std::string value);
-	DWORD getProcessID(void);
-	uintptr_t getBaseAddress(void);
-	void start(void);
-	void stop(void);
-	void hookStatus(void);
-	void update();
+	static DWORD getProcessID(void);
+	static uintptr_t getBaseAddress(void);
+	static void start(void);
+	static void stop(void);
+	static void hookStatus(void);
+	static void update();
 
 	//Getters
 	static bool isHooked(void); // main.cpp startup check
@@ -83,8 +83,8 @@ template<typename T>
 inline T ReplicantHook::readMemory(uintptr_t address)
 {
 	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, this->_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(this->_baseAddress + address), &value, sizeof(value), NULL);
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
 	CloseHandle(pHandle); //Close handle to prevent memory leaks
 	return value;
 }
