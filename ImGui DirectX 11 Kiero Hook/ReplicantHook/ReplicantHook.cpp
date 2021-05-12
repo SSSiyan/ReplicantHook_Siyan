@@ -3,6 +3,7 @@
 int ReplicantHook::gold(NULL);
 uintptr_t ReplicantHook::_baseAddress(NULL);
 DWORD ReplicantHook::_pID(NULL);
+/*
 uintptr_t ReplicantHook::actorPlayable(NULL);
 bool ReplicantHook::_hooked(NULL);
 std::string ReplicantHook::zone(NULL);
@@ -14,7 +15,7 @@ double ReplicantHook::playtime(NULL);
 float ReplicantHook::x(NULL);
 float ReplicantHook::y(NULL);
 float ReplicantHook::z(NULL);
-
+*/
 DWORD ReplicantHook::_getProcessID(void)
 {
 	//Search game window
