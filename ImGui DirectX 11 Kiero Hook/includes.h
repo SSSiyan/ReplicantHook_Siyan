@@ -9,7 +9,7 @@
 
 #include "ReplicantHook/ReplicantHook.hpp"
 
-//#include <thread>
+#include <thread>
 #include <iostream>
 #include <dinput.h>
 #include "minhook/include/MinHook.h"

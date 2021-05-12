@@ -41,6 +41,7 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 bool init = false;
+bool draw = false;
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	if (!init)
@@ -64,10 +65,29 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
+	if (GetAsyncKeyState(VK_INSERT) & 1) {
+		draw = !draw;
+		if (draw) ReplicantHook::stealCursor(1);
+		else ReplicantHook::stealCursor(0);
+	}
+
+	if (!draw) {
+		goto imgui_finish;
+	}
+
+	ImGui::GetIO().MouseDrawCursor = true; //good
+
+	//ShowCursor(true); //broke
+	//ClipCursor(NULL); //broke
+
+
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	
 
+
+	ImGui::CaptureMouseFromApp();
 	ImGui::Begin("ImGui Window");
 
 	ImGui::SliderInt("Gold Amount", &ReplicantHook::gold, 0, 10000);
@@ -83,6 +103,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+imgui_finish:
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
@@ -159,14 +181,14 @@ int main()
 	std::cout << "Hooked" << std::endl;
 
 	//Enable some cheats
-	// hook.InfiniteHealth(true); // disabled for testing
-	hook.InfiniteMagic(true);
+	//hook.InfiniteHealth(true); // disabled for testing
+	//hook.InfiniteMagic(true);
 
 	//Change actor model
-	hook.setActorModel("nierF");
+	//hook.setActorModel("nierF");
 
 	//Create a thread to exit when the 'END' button is pressed
-	//thread exitThread(ENDPressed, &hook);
+	std::thread exitThread(ENDPressed, &hook);
 
 	//Print some values
 	/*
@@ -181,7 +203,7 @@ int main()
 	}
 	*/
 	//Join thread and exit
-	//exitThread.join();
+	exitThread.join();
 
 	return 0;
 }

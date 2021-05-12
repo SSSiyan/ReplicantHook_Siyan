@@ -26,7 +26,7 @@ private:
 	uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
 	void _hook(void);
 	void _unHook(void);
-	void _patch(BYTE* destination, BYTE* src, unsigned int size);
+	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 	template <typename T>
 	T readMemory(uintptr_t address);
 	template <typename T>
@@ -36,7 +36,7 @@ private:
 
 public:
 	DWORD getProcessID(void);
-	uintptr_t getBaseAddress(void);
+	static uintptr_t getBaseAddress(void);
 	void start(void);
 	void stop(void);
 	void hookStatus(void);
@@ -56,6 +56,7 @@ public:
 	float getZ();
 
 	//Setters
+	static void stealCursor(bool toggle);
 	static void setGold(int value);
 	void setZone(std::string value);
 	void setName(std::string value);

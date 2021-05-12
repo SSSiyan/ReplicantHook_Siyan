@@ -77,7 +77,7 @@ void ReplicantHook::_unHook(void)
 	ReplicantHook::_pID = 0;
 	ReplicantHook::_baseAddress = 0;
 	ReplicantHook::actorPlayable = 0;
-	//ReplicantHook::gold = 0;
+	ReplicantHook::gold = 0;
 	ReplicantHook::zone = "";
 	ReplicantHook::name = "";
 	ReplicantHook::health = 0;
@@ -215,6 +215,22 @@ float ReplicantHook::getY()
 float ReplicantHook::getZ()
 {
 	return ReplicantHook::z;
+}
+
+void ReplicantHook::stealCursor(bool enabled)
+{
+	if (enabled) // stop the game from hiding cursor
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
+		ReplicantHook::writeMemory(0x443C1FD, true);  // show cursor
+		ReplicantHook::writeMemory(0x443C1FE, false); // disable game input
+	}
+	else		// allow the game to hide cursor
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\xC6\x86\x8D\x00\x00\x00\x00", 7);
+		ReplicantHook::writeMemory(0x443C1FD, false); // hide cursor
+		ReplicantHook::writeMemory(0x443C1FE, true);  // enable game input
+	}
 }
 
 void ReplicantHook::setGold(int value)
