@@ -18,6 +18,9 @@
     <Filter Include="ReplicantHook">
       <UniqueIdentifier>{bfbb1d54-3c0e-4058-928a-7a4f5f615141}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{11306c13-1a6d-42e3-939b-853023158ff5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="kiero\minhook\src\buffer.c">
@@ -61,6 +64,21 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\crash_handler.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\MessageDisplay.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\String.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Timer.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\config.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +143,27 @@
     </ClInclude>
     <ClInclude Include="includes.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility\config.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\crash_handler.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Hash.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\MessageDisplay.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\RingBuffer.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\String.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Timer.hpp">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

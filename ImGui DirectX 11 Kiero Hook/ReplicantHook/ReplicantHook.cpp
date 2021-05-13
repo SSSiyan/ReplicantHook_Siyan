@@ -1,17 +1,15 @@
 #include "ReplicantHook.hpp"
 
-int ReplicantHook::gold(NULL);
+// dev
 uintptr_t ReplicantHook::_baseAddress(NULL);
 DWORD ReplicantHook::_pID(NULL);
 bool ReplicantHook::_hooked(NULL);
-
-bool ReplicantHook::cursorForceHidden = false;
-
 uintptr_t ReplicantHook::actorPlayable(NULL);
 
+// values
+int ReplicantHook::gold(NULL);
 std::string ReplicantHook::zone;
 std::string ReplicantHook::name;
-
 int ReplicantHook::health(NULL);
 float ReplicantHook::magic(NULL);
 int ReplicantHook::level(NULL);
@@ -19,6 +17,10 @@ double ReplicantHook::playtime(NULL);
 float ReplicantHook::x(NULL);
 float ReplicantHook::y(NULL);
 float ReplicantHook::z(NULL);
+
+// toggles
+bool ReplicantHook::cursorForceHidden_toggle(false);
+bool ReplicantHook::forceModelsVisible_toggle(false);
 
 DWORD ReplicantHook::_getProcessID(void)
 {
@@ -74,6 +76,7 @@ void ReplicantHook::_hook(void)
 	ReplicantHook::_baseAddress = ReplicantHook::_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
 	ReplicantHook::_hooked = true;
 }
+
 // unhook nier
 void ReplicantHook::_unHook(void)
 {
@@ -218,7 +221,7 @@ void ReplicantHook::stealCursor(bool enabled)
 	}
 }
 
-void ReplicantHook::hideCursor(bool enabled)
+void ReplicantHook::cursorForceHidden(bool enabled) // disables the game displaying the cursor when using a gamepad
 {
 	if (enabled)
 	{
@@ -235,6 +238,19 @@ void ReplicantHook::hideCursor(bool enabled)
 void ReplicantHook::setGold(int value)
 {
 	ReplicantHook::writeMemory(0x437284C, value);
+}
+
+void ReplicantHook::forceModelsVisible(bool enabled)
+{
+	if (enabled)
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x15676A), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90\x90", 8);
+
+	}
+	else
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x15676A), (BYTE*)"\xF3\x0F\x10\x8B\x80\x15\x00\x00", 8);
+	}
 }
 
 void ReplicantHook::setZone(std::string value)
@@ -326,16 +342,16 @@ void ReplicantHook::setActorModel(std::string model)
 	case str2int("nierY"):
 		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x59\x00\x00"; // nierY
 		break;
-		//case str2int("nier010"):
+	//  case str2int("nier010"):
 		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x30"; // nier010
 		//	break;
-		//case str2int("nier011"):
+	//  case str2int("nier011"):
 		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x31"; // nier011
 		//	break;
-		//case str2int("nier020"):
+	//  case str2int("nier020"):
 		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x32\x30"; // nier020
 		//	break;
-		//case str2int("nier030"):
+	//  case str2int("nier030"):
 		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x33\x30"; // nier030
 		//	break;
 	case str2int("kaineE"):
@@ -352,3 +368,16 @@ std::string ReplicantHook::getActorModel()
 {
 	return ReplicantHook::readMemoryString(0x0B88280);
 }
+
+void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
+	cursorForceHidden_toggle = cfg.get<bool>("cursorForceHidden").value_or(false);
+	cursorForceHidden(cursorForceHidden_toggle);
+	forceModelsVisible_toggle = cfg.get<bool>("forceModelsVisible").value_or(false);
+	forceModelsVisible(forceModelsVisible_toggle);
+};
+
+void ReplicantHook::onConfigSave(utils::Config& cfg) {
+	cfg.set<bool>("cursorForceHidden", cursorForceHidden_toggle);
+	cfg.set<bool>("forceModelsVisible", forceModelsVisible_toggle);
+	cfg.save("Replicant_Hook.cfg");
+};

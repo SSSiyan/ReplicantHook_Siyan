@@ -41,16 +41,24 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 bool imguiInit = false;
 bool imguiDraw = false;
 
-void OpenedHook() // called when the user opens imgui
+utils::Config cfg{ "replicant_hook.cfg" };
+
+void OpenedHook() // called when the user opens or closes imgui
 {
 	// open imgui and steal cursor
 	imguiDraw = !imguiDraw;
-	if (imguiDraw) ReplicantHook::stealCursor(1);
-	else ReplicantHook::stealCursor(0);
-
-	// update values
-	ReplicantHook::getGold();
-	ReplicantHook::getZone();
+	if (imguiDraw)
+	{
+		ReplicantHook::stealCursor(1);
+		// update values
+		ReplicantHook::getGold();
+		ReplicantHook::getZone();
+	}
+	else
+	{
+		ReplicantHook::stealCursor(0);
+		ReplicantHook::onConfigSave(cfg); // save config on hook close
+	}
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -82,8 +90,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	if (GetAsyncKeyState(VK_DELETE) & 1)
 	{
-		ReplicantHook::cursorForceHidden =! ReplicantHook::cursorForceHidden; // toggle
-		ReplicantHook::hideCursor(ReplicantHook::cursorForceHidden);
+		ReplicantHook::cursorForceHidden_toggle =! ReplicantHook::cursorForceHidden_toggle; // toggle
+		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 	}
 
 	if (!imguiDraw) {
@@ -100,9 +108,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		ReplicantHook::setGold(ReplicantHook::gold);
 	}
 
-	if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden)) // toggle
+	if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden_toggle)) // toggle
 	{
-		ReplicantHook::hideCursor(ReplicantHook::cursorForceHidden);
+		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
+	}
+
+	if (ImGui::Checkbox("Force Models 100% visible", &ReplicantHook::forceModelsVisible_toggle)) // toggle
+	{
+		ReplicantHook::forceModelsVisible(ReplicantHook::forceModelsVisible_toggle);
 	}
 
 	ImGui::End();
@@ -141,7 +154,9 @@ int main()
 		hook.start();
 		Sleep(500);
 	}
+	// now hooked
 	std::cout << "Hooked" << std::endl;
+	ReplicantHook::onConfigLoad(cfg);
 
 	// enable some cheats
 	// hook.InfiniteHealth(true);

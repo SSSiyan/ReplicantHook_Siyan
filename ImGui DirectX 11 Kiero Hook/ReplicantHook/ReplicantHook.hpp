@@ -2,10 +2,11 @@
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <string>
-
+#include "../utils/config.hpp"
 class ReplicantHook
 {
 private:
+	// none of this needs to be private
 	// values
 	static DWORD _pID;
 	static uintptr_t _baseAddress;
@@ -32,7 +33,8 @@ public:
 	void hookStatus(void);
 	void update();
 
-	static bool cursorForceHidden;
+	static bool cursorForceHidden_toggle;
+	static bool forceModelsVisible_toggle;
 
 	// getters
 	bool isHooked(void); // main.cpp startup check
@@ -46,11 +48,14 @@ public:
 	float getX();
 	float getY();
 	float getZ();
+	std::string getActorModel();
 
 	// setters
-	static void stealCursor(bool toggle);
-	static void hideCursor(bool toggle);
+	static void stealCursor(bool enable);
+	static void cursorForceHidden(bool enable);
 	static void setGold(int value);
+	static void forceModelsVisible(bool enable);
+
 	void setZone(std::string value);
 	void setName(std::string value);
 	void setHealth(int value);
@@ -61,16 +66,13 @@ public:
 	void setY(float value);
 	void setZ(float value);
 	void setPosition(float x, float y, float z);
+	void setActorModel(std::string model);
 
 	// cheats
 	void InfiniteHealth(bool enabled);
 	void InfiniteMagic(bool enabled);
 
-	// models
-	void setActorModel(std::string model);
-	std::string getActorModel();
-
-	// values - static for imgui
+	// values
 	static int health;
 	static float magic;
 	static int level;
@@ -81,6 +83,10 @@ public:
 	static int gold;
 	static std::string zone;
 	static std::string name;
+
+	// saving and loading
+	static void onConfigLoad(const utils::Config& cfg);
+	static void onConfigSave(utils::Config& cfg);
 };
 
 template<typename T>

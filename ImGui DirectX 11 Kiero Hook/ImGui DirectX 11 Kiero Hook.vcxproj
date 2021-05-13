@@ -145,6 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\crash_handler.cpp" />
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\MessageDisplay.cpp" />
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\String.cpp" />
+    <ClCompile Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Timer.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -159,6 +163,7 @@
     <ClCompile Include="kiero\minhook\src\trampoline.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ReplicantHook\ReplicantHook.cpp" />
+    <ClCompile Include="utils\config.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="kiero\minhook\dll_resources\MinHook.def" />
@@ -167,6 +172,12 @@
     <ResourceCompile Include="kiero\minhook\dll_resources\MinHook.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\crash_handler.h" />
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Hash.hpp" />
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\MessageDisplay.hpp" />
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\RingBuffer.hpp" />
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\String.hpp" />
+    <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Timer.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -186,6 +197,7 @@
     <ClInclude Include="kiero\minhook\src\hde\table64.h" />
     <ClInclude Include="kiero\minhook\src\trampoline.h" />
     <ClInclude Include="ReplicantHook\ReplicantHook.hpp" />
+    <ClInclude Include="utility\config.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
