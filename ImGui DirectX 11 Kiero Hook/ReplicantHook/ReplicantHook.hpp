@@ -12,9 +12,6 @@ private:
 	uintptr_t actorPlayable;
 	static bool _hooked;
 
-	std::string zone; // anything that uses read/write string breaks
-	std::string name;
-
 	DWORD _getProcessID(void);
 	uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
 	void _hook(void);
@@ -24,8 +21,8 @@ private:
 	T readMemory(uintptr_t address);
 	template <typename T>
 	static void writeMemory(uintptr_t address, T value);
-	std::string readMemoryString(uintptr_t address);
-	void writeMemoryString(uintptr_t address, std::string value);
+	//std::string readMemoryString(uintptr_t address);
+	//void writeMemoryString(uintptr_t address, std::string value);
 
 public:
 	DWORD getProcessID(void);
@@ -40,8 +37,8 @@ public:
 	//Getters
 	bool isHooked(void); // main.cpp startup check
 	static int getGold();
-	std::string getZone();
-	std::string getName();
+	//static std::string getZone();
+	//static std::string getName();
 	int getHealth();
 	float getMagic();
 	int getLevel();
@@ -82,6 +79,8 @@ public:
 	static float y;
 	static float z;
 	static int gold;
+	//static std::string zone; // anything that uses read/write string breaks
+	//static std::string name;
 };
 
 template<typename T>
@@ -101,4 +100,21 @@ inline void ReplicantHook::writeMemory(uintptr_t address, T value)
 	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
 	CloseHandle(pHandle);
 }
+/*
+inline std::string ReplicantHook::readMemoryString(uintptr_t address)
+{
+	char val[20];
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
+	CloseHandle(pHandle); //Close handle to prevent memory leaks
+	return std::string(val);
+}
 
+inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
+{
+	SIZE_T BytesToWrite = value.length() + 1;
+	SIZE_T BytesWritten;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
+}
+*/
