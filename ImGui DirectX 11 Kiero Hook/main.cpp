@@ -47,6 +47,8 @@ void OpenedHook()
 	imguiDraw = !imguiDraw;
 	if (imguiDraw) ReplicantHook::stealCursor(1);
 	else ReplicantHook::stealCursor(0);
+
+	ReplicantHook::getGold();
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -76,9 +78,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		OpenedHook();
 	}
 
-	if (GetAsyncKeyState(VK_DELETE) & 1) //END button pressed
+	if (GetAsyncKeyState(VK_DELETE) & 1)
 	{
-		ReplicantHook::cursorForceHidden = !ReplicantHook::cursorForceHidden;
+		ReplicantHook::cursorForceHidden = !ReplicantHook::cursorForceHidden; // toggle
 		ReplicantHook::hideCursor(ReplicantHook::cursorForceHidden);
 	}
 
@@ -89,20 +91,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	
 	ImGui::Begin("ImGui Window");
 
-	ImGui::SliderInt("Gold Amount", &ReplicantHook::gold, 0, 10000);
-
-	if (ImGui::Button("Set Gold"))
+	if (ImGui::InputInt("Gold Amount", &ReplicantHook::gold, 1, 100))
 	{
 		ReplicantHook::setGold(ReplicantHook::gold);
 	}
 
+	if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden)) // toggle
+	{
+		ReplicantHook::hideCursor(ReplicantHook::cursorForceHidden);
+	}
+
 	ImGui::End();
-
 	ImGui::Render();
-
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -193,18 +195,18 @@ int main()
 	//Create a thread to exit when the 'END' button is pressed
 	std::thread exitThread(ENDPressed, &hook);
 
-	/*
+	
 	//Print some values
 	while (hook.isHooked()) {
 		hook.update();
-		std::cout << "Magic " << hook.getMagic() << std::endl;
-		std::cout << "Health " << hook.getHealth() << std::endl;
-		std::cout << "Gold " << hook.getGold() << std::endl;
-		std::cout << "Zone " << hook.getZone() << std::endl;
+		//std::cout << "Magic " << hook.getMagic() << std::endl;
+		//std::cout << "Health " << hook.getHealth() << std::endl;
+		//std::cout << "Gold " << hook.getGold() << std::endl;
+		//std::cout << "Zone " << hook.getZone() << std::endl;
 		Sleep(500);
-		system("cls");
+		//system("cls");
 	}
-	*/
+	
 	//Join thread and exit
 	exitThread.join();
 

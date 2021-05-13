@@ -12,15 +12,8 @@ private:
 	uintptr_t actorPlayable;
 	static bool _hooked;
 
-	std::string zone;
+	std::string zone; // anything that uses read/write string breaks
 	std::string name;
-	int health;
-	float magic;
-	int level;
-	double playtime;
-	float x;
-	float y;
-	float z;
 
 	DWORD _getProcessID(void);
 	uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
@@ -46,7 +39,7 @@ public:
 
 	//Getters
 	bool isHooked(void); // main.cpp startup check
-	int getGold();
+	static int getGold();
 	std::string getZone();
 	std::string getName();
 	int getHealth();
@@ -80,7 +73,14 @@ public:
 	void setActorModel(std::string model);
 	std::string getActorModel();
 
-	//Added
+	//Values - static for imgui
+	static int health;
+	static float magic;
+	static int level;
+	static double playtime;
+	static float x;
+	static float y;
+	static float z;
 	static int gold;
 };
 
