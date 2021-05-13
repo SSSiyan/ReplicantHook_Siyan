@@ -3,9 +3,10 @@
 int ReplicantHook::gold(NULL);
 uintptr_t ReplicantHook::_baseAddress(NULL);
 DWORD ReplicantHook::_pID(NULL);
+bool ReplicantHook::_hooked(NULL);
+
 /*
 uintptr_t ReplicantHook::actorPlayable(NULL);
-bool ReplicantHook::_hooked(NULL);
 std::string ReplicantHook::zone(NULL);
 std::string ReplicantHook::name(NULL);
 int ReplicantHook::health(NULL);

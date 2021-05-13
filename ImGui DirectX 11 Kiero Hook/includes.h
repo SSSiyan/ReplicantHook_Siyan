@@ -12,7 +12,6 @@
 #include <thread>
 #include <iostream>
 #include <dinput.h>
-#include "minhook/include/MinHook.h"
 
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);

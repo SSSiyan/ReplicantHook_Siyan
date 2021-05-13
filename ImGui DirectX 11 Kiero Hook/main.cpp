@@ -40,11 +40,20 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-bool init = false;
-bool draw = false;
+bool imguiInit = false;
+bool imguiDraw = false;
+
+void OpenedHook()
+{
+	imguiDraw = !imguiDraw;
+	if (imguiDraw) ReplicantHook::stealCursor(1);
+	else ReplicantHook::stealCursor(0);
+}
+
+
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	if (!init)
+	if (!imguiInit)
 	{
 		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)& pDevice)))
 		{
@@ -59,35 +68,24 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			pBackBuffer->Release();
 			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 			InitImGui();
-			init = true;
+			imguiInit = true;
 		}
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
 	if (GetAsyncKeyState(VK_INSERT) & 1) {
-		draw = !draw;
-		if (draw) ReplicantHook::stealCursor(1);
-		else ReplicantHook::stealCursor(0);
+		OpenedHook();
 	}
 
-	if (!draw) {
+	if (!imguiDraw) {
 		goto imgui_finish;
 	}
-
-	ImGui::GetIO().MouseDrawCursor = true; //good
-
-	//ShowCursor(true); //broke
-	//ClipCursor(NULL); //broke
-
 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	
-
-
-	ImGui::CaptureMouseFromApp();
 	ImGui::Begin("ImGui Window");
 
 	ImGui::SliderInt("Gold Amount", &ReplicantHook::gold, 0, 10000);
@@ -185,7 +183,7 @@ int main()
 	//hook.InfiniteMagic(true);
 
 	//Change actor model
-	//hook.setActorModel("nierF");
+	hook.setActorModel("kaineE");
 
 	//Create a thread to exit when the 'END' button is pressed
 	std::thread exitThread(ENDPressed, &hook);

@@ -10,7 +10,7 @@ private:
 	static DWORD _pID;
 	static uintptr_t _baseAddress;
 	uintptr_t actorPlayable;
-	bool _hooked;
+	static bool _hooked;
 
 	std::string zone;
 	std::string name;
