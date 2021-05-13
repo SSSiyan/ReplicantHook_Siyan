@@ -7,11 +7,10 @@ bool ReplicantHook::_hooked(NULL);
 
 bool ReplicantHook::cursorForceHidden = false;
 
+uintptr_t ReplicantHook::actorPlayable(NULL);
 
-//uintptr_t ReplicantHook::actorPlayable(NULL);
-
-//std::string ReplicantHook::zone(NULL);
-//std::string ReplicantHook::name(NULL);
+std::string ReplicantHook::zone;
+std::string ReplicantHook::name;
 
 int ReplicantHook::health(NULL);
 float ReplicantHook::magic(NULL);
@@ -21,14 +20,13 @@ float ReplicantHook::x(NULL);
 float ReplicantHook::y(NULL);
 float ReplicantHook::z(NULL);
 
-
 DWORD ReplicantHook::_getProcessID(void)
 {
-	//Search game window
+	// search game window
 	HWND hwnd = FindWindowA(NULL, "NieR Replicant ver.1.22474487139...");
 	if (hwnd == NULL)
 	{
-		//return if game window not found
+		// return if game window not found
 		return 0;
 	}
 	DWORD pID;													  //Process ID
@@ -36,7 +34,7 @@ DWORD ReplicantHook::_getProcessID(void)
 	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pID); //Open process
 	if (pHandle == INVALID_HANDLE_VALUE)
 	{
-		//return if couldn't open the process
+		// return if couldn't open the process
 		return 0;
 	}
 	return pID;
@@ -62,11 +60,11 @@ uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName
 			} while (Module32Next(hSnap, &modEntry));
 		}
 	}
-	CloseHandle(hSnap); //Close handle to prevent memory leaks
+	CloseHandle(hSnap); // close handle to prevent memory leaks
 	return modBaseAddr;
 }
 
-//Hook to NieR
+// hook nier
 void ReplicantHook::_hook(void)
 {
 	DWORD ID = ReplicantHook::_getProcessID();
@@ -76,7 +74,7 @@ void ReplicantHook::_hook(void)
 	ReplicantHook::_baseAddress = ReplicantHook::_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
 	ReplicantHook::_hooked = true;
 }
-//unHook NieR
+// unhook nier
 void ReplicantHook::_unHook(void)
 {
 	ReplicantHook::_hooked = false;
@@ -84,8 +82,8 @@ void ReplicantHook::_unHook(void)
 	ReplicantHook::_baseAddress = 0;
 	ReplicantHook::actorPlayable = 0;
 	ReplicantHook::gold = 0;
-	//ReplicantHook::zone = "";
-	//ReplicantHook::name = "";
+	ReplicantHook::zone = "";
+	ReplicantHook::name = "";
 	ReplicantHook::health = 0;
 	ReplicantHook::magic = 0.0f;
 	ReplicantHook::level = 0;
@@ -139,8 +137,8 @@ void ReplicantHook::update()
 {
 	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D0);
 	ReplicantHook::gold = readMemory<int>(0x437284C);
-	//ReplicantHook::zone = readMemoryString(0x4372794);
-	//ReplicantHook::name = readMemoryString(0x43727BC);
+	ReplicantHook::zone = readMemoryString(0x4372794);
+	ReplicantHook::name = readMemoryString(0x43727BC);
 	ReplicantHook::health = readMemory<int>(0x43727DC);
 	ReplicantHook::magic = readMemory<float>(0x43727E8);
 	ReplicantHook::level = readMemory<int>(0x43727F4);
@@ -159,7 +157,7 @@ int ReplicantHook::getGold()
 {
 	return ReplicantHook::gold;
 }
-/*
+
 std::string ReplicantHook::getZone()
 {
 	return ReplicantHook::zone;
@@ -169,7 +167,7 @@ std::string ReplicantHook::getName()
 {
 	return ReplicantHook::name;
 }
-*/
+
 int ReplicantHook::getHealth()
 {
 	return ReplicantHook::health;
@@ -238,7 +236,7 @@ void ReplicantHook::setGold(int value)
 {
 	ReplicantHook::writeMemory(0x437284C, value);
 }
-/*
+
 void ReplicantHook::setZone(std::string value)
 {
 	ReplicantHook::writeMemoryString(0x4372794, value);
@@ -248,7 +246,7 @@ void ReplicantHook::setName(std::string value)
 {
 	ReplicantHook::writeMemoryString(0x43727BC, value);
 }
-*/
+
 void ReplicantHook::setHealth(int value)
 {
 	ReplicantHook::writeMemory(0x43727DC, value);
@@ -317,41 +315,40 @@ void ReplicantHook::setActorModel(std::string model)
 	BYTE* modelBytes;
 	switch (str2int(model.c_str())) {
 	case str2int("nierB"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; //nierB
+		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; // nierB
 		break;
 	case str2int("nierT"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x54\x00\x00"; //nierT
+		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x54\x00\x00"; // nierT
 		break;
 	case str2int("nierF"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x46\x00\x00"; //nierF
+		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x46\x00\x00"; // nierF
 		break;
 	case str2int("nierY"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x59\x00\x00"; //nierY
+		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x59\x00\x00"; // nierY
 		break;
 		//case str2int("nier010"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x30"; //nier010
+		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x30"; // nier010
 		//	break;
 		//case str2int("nier011"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x31"; //nier011
+		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x31"; // nier011
 		//	break;
 		//case str2int("nier020"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x32\x30"; //nier020
+		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x32\x30"; // nier020
 		//	break;
 		//case str2int("nier030"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x33\x30"; //nier030
+		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x33\x30"; // nier030
 		//	break;
 	case str2int("kaineE"):
-		modelBytes = (BYTE*)"\x6B\x61\x69\x6E\x65\x45\x00"; //kaineE
+		modelBytes = (BYTE*)"\x6B\x61\x69\x6E\x65\x45\x00"; // kaineE
 		break;
 	default:
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; //default nierB
+		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; // default nierB
 		break;
 	}
 	ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x0B88280), modelBytes, 7);
 }
-/*
+
 std::string ReplicantHook::getActorModel()
 {
 	return ReplicantHook::readMemoryString(0x0B88280);
 }
-*/

@@ -1,4 +1,3 @@
-#define DIRECTINPUT_VERSION 0x0800
 #include "includes.h"
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -9,8 +8,8 @@ ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
 ID3D11RenderTargetView* mainRenderTargetView;
 
-HMODULE g_dinput = 0;
 
+HMODULE g_dinput = 0;
 extern "C" {
 	__declspec(dllexport) HRESULT WINAPI direct_input8_create(HINSTANCE hinst, DWORD dw_version, const IID& riidltf, LPVOID* ppv_out, LPUNKNOWN punk_outer) {
 #pragma comment(linker, "/EXPORT:DirectInput8Create=direct_input8_create")
@@ -42,13 +41,16 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 bool imguiInit = false;
 bool imguiDraw = false;
 
-void OpenedHook()
+void OpenedHook() // called when the user opens imgui
 {
+	// open imgui and steal cursor
 	imguiDraw = !imguiDraw;
 	if (imguiDraw) ReplicantHook::stealCursor(1);
 	else ReplicantHook::stealCursor(0);
 
+	// update values
 	ReplicantHook::getGold();
+	ReplicantHook::getZone();
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -80,7 +82,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	if (GetAsyncKeyState(VK_DELETE) & 1)
 	{
-		ReplicantHook::cursorForceHidden = !ReplicantHook::cursorForceHidden; // toggle
+		ReplicantHook::cursorForceHidden =! ReplicantHook::cursorForceHidden; // toggle
 		ReplicantHook::hideCursor(ReplicantHook::cursorForceHidden);
 	}
 
@@ -111,8 +113,62 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 imgui_finish:
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
+/*
+// exit the program
+void ENDPressed(ReplicantHook* hook) {
+	while (true) {
+		if (GetKeyState(VK_END) & 0x8000)
+		{
+			// disable cheats
+			hook->InfiniteHealth(false);
+			hook->InfiniteMagic(false);
+			// stop hook
+			hook->stop();
+			return;
+		}
+	}
+}
+*/
+int main()
+{
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //Look for memory leaks
 
-int main();
+	ReplicantHook hook = ReplicantHook();
+	std::cout << "Replicant Hook\n";
+	std::cout << "Hooking..." << std::endl;
+	// hook to process
+	while (!hook.isHooked()) {
+		hook.start();
+		Sleep(500);
+	}
+	std::cout << "Hooked" << std::endl;
+
+	// enable some cheats
+	// hook.InfiniteHealth(true);
+	// hook.InfiniteMagic(true);
+
+	// change actor model
+	// hook.setActorModel("kaineE");
+
+	// create a thread to exit when the 'END' button is pressed
+	// std::thread exitThread(ENDPressed, &hook);
+
+	// print some values
+	while (hook.isHooked()) {
+		hook.update();
+		// std::cout << "Magic " << hook.getMagic() << std::endl;
+		// std::cout << "Health " << hook.getHealth() << std::endl;
+		// std::cout << "Gold " << hook.getGold() << std::endl;
+		// std::cout << "Zone " << hook.getZone() << std::endl;
+		Sleep(500);
+		// system("cls");
+	}
+
+	// join thread and exit
+	// exitThread.join();
+
+	return 0;
+}
 
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
@@ -123,7 +179,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 			failed();
 		}
 	}
-	Sleep(10000); // to hook after game is loaded
+	Sleep(10000); // hook after game is loaded
 	bool init_hook = false;
 	do
 	{
@@ -150,65 +206,4 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 		break;
 	}
 	return TRUE;
-}
-
-
-//Function used to exit the program
-void ENDPressed(ReplicantHook* hook) {
-	while (true) {
-		if (GetKeyState(VK_END) & 0x8000) //END button pressed
-		{
-			//Disable cheats before exiting
-			hook->InfiniteHealth(false);
-			hook->InfiniteMagic(false);
-			//Stop hook
-			hook->stop();
-			return; //exit function
-		}
-	}
-}
-
-/*This is a showcase program of the hook
-* As NieR Replicant ver.1.22474487139 is a x64 program, you must compile this solution in x64.
-*/
-int main()
-{
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //Look for memory leaks
-
-	ReplicantHook hook = ReplicantHook();
-	std::cout << "Replicant Hook\n";
-	std::cout << "Hooking..." << std::endl;
-	//Hook to process
-	while (!hook.isHooked()) {
-		hook.start();
-		Sleep(500);
-	}
-	std::cout << "Hooked" << std::endl;
-
-	//Enable some cheats
-	//hook.InfiniteHealth(true);
-	//hook.InfiniteMagic(true);
-
-	//Change actor model
-	//hook.setActorModel("kaineE");
-
-	//Create a thread to exit when the 'END' button is pressed
-	std::thread exitThread(ENDPressed, &hook);
-
-	
-	//Print some values
-	while (hook.isHooked()) {
-		hook.update();
-		//std::cout << "Magic " << hook.getMagic() << std::endl;
-		//std::cout << "Health " << hook.getHealth() << std::endl;
-		//std::cout << "Gold " << hook.getGold() << std::endl;
-		//std::cout << "Zone " << hook.getZone() << std::endl;
-		Sleep(500);
-		//system("cls");
-	}
-	
-	//Join thread and exit
-	exitThread.join();
-
-	return 0;
 }

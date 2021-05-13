@@ -9,7 +9,7 @@ private:
 	// values
 	static DWORD _pID;
 	static uintptr_t _baseAddress;
-	uintptr_t actorPlayable;
+	static uintptr_t actorPlayable;
 	static bool _hooked;
 
 	DWORD _getProcessID(void);
@@ -18,11 +18,11 @@ private:
 	void _unHook(void);
 	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 	template <typename T>
-	T readMemory(uintptr_t address);
+	static T readMemory(uintptr_t address);
 	template <typename T>
 	static void writeMemory(uintptr_t address, T value);
-	//std::string readMemoryString(uintptr_t address);
-	//void writeMemoryString(uintptr_t address, std::string value);
+	static std::string readMemoryString(uintptr_t address);
+	static void writeMemoryString(uintptr_t address, std::string value);
 
 public:
 	DWORD getProcessID(void);
@@ -34,11 +34,11 @@ public:
 
 	static bool cursorForceHidden;
 
-	//Getters
+	// getters
 	bool isHooked(void); // main.cpp startup check
 	static int getGold();
-	//static std::string getZone();
-	//static std::string getName();
+	static std::string getZone();
+	static std::string getName();
 	int getHealth();
 	float getMagic();
 	int getLevel();
@@ -47,7 +47,7 @@ public:
 	float getY();
 	float getZ();
 
-	//Setters
+	// setters
 	static void stealCursor(bool toggle);
 	static void hideCursor(bool toggle);
 	static void setGold(int value);
@@ -62,15 +62,15 @@ public:
 	void setZ(float value);
 	void setPosition(float x, float y, float z);
 
-	//Cheats
+	// cheats
 	void InfiniteHealth(bool enabled);
 	void InfiniteMagic(bool enabled);
 
-	//Models
+	// models
 	void setActorModel(std::string model);
 	std::string getActorModel();
 
-	//Values - static for imgui
+	// values - static for imgui
 	static int health;
 	static float magic;
 	static int level;
@@ -79,8 +79,8 @@ public:
 	static float y;
 	static float z;
 	static int gold;
-	//static std::string zone; // anything that uses read/write string breaks
-	//static std::string name;
+	static std::string zone;
+	static std::string name;
 };
 
 template<typename T>
@@ -89,7 +89,7 @@ inline T ReplicantHook::readMemory(uintptr_t address)
 	T value;
 	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
 	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); //Close handle to prevent memory leaks
+	CloseHandle(pHandle); // close handle to prevent memory leaks
 	return value;
 }
 
@@ -100,13 +100,13 @@ inline void ReplicantHook::writeMemory(uintptr_t address, T value)
 	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
 	CloseHandle(pHandle);
 }
-/*
+
 inline std::string ReplicantHook::readMemoryString(uintptr_t address)
 {
 	char val[20];
 	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
 	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
-	CloseHandle(pHandle); //Close handle to prevent memory leaks
+	CloseHandle(pHandle); // close handle to prevent memory leaks
 	return std::string(val);
 }
 
@@ -117,4 +117,3 @@ inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string valu
 	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
 	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
 }
-*/
