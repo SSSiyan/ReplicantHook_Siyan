@@ -17,6 +17,7 @@ float ReplicantHook::x(NULL);
 float ReplicantHook::y(NULL);
 float ReplicantHook::z(NULL);
 */
+
 DWORD ReplicantHook::_getProcessID(void)
 {
 	//Search game window
@@ -61,7 +62,7 @@ uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName
 	return modBaseAddr;
 }
 
-//Hook to NieR:Automata process
+//Hook to NieR
 void ReplicantHook::_hook(void)
 {
 	DWORD ID = ReplicantHook::_getProcessID();
@@ -71,7 +72,7 @@ void ReplicantHook::_hook(void)
 	ReplicantHook::_baseAddress = ReplicantHook::_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
 	ReplicantHook::_hooked = true;
 }
-//unHook NieR:Automata
+//unHook NieR
 void ReplicantHook::_unHook(void)
 {
 	ReplicantHook::_hooked = false;

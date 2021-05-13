@@ -31,7 +31,6 @@ void InitImGui()
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
-
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
@@ -49,7 +48,6 @@ void OpenedHook()
 	if (imguiDraw) ReplicantHook::stealCursor(1);
 	else ReplicantHook::stealCursor(0);
 }
-
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
@@ -117,7 +115,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 			failed();
 		}
 	}
-	Sleep(10000); // to hook after game is loaded
+	Sleep(1000); // to hook after game is loaded
 	bool init_hook = false;
 	do
 	{
@@ -179,17 +177,17 @@ int main()
 	std::cout << "Hooked" << std::endl;
 
 	//Enable some cheats
-	//hook.InfiniteHealth(true); // disabled for testing
+	//hook.InfiniteHealth(true);
 	//hook.InfiniteMagic(true);
 
 	//Change actor model
-	hook.setActorModel("kaineE");
+	//hook.setActorModel("kaineE");
 
 	//Create a thread to exit when the 'END' button is pressed
 	std::thread exitThread(ENDPressed, &hook);
 
-	//Print some values
 	/*
+	//Print some values
 	while (hook.isHooked()) {
 		hook.update();
 		std::cout << "Magic " << hook.getMagic() << std::endl;
