@@ -33,9 +33,6 @@ public:
 	void hookStatus(void);
 	void update();
 
-	static bool cursorForceHidden_toggle;
-	static bool forceModelsVisible_toggle;
-
 	// getters
 	bool isHooked(void); // main.cpp startup check
 	static int getGold();
@@ -50,11 +47,20 @@ public:
 	float getZ();
 	std::string getActorModel();
 
+	// toggles
+	static bool cursorForceHidden_toggle;
+	static bool forceModelsVisible_toggle;
+	static bool infiniteJumps_toggle;
+	static bool infiniteAirCombos_toggle;
+	static bool forceCharSelect_toggle;
+
 	// setters
 	static void stealCursor(bool enable);
 	static void cursorForceHidden(bool enable);
 	static void setGold(int value);
 	static void forceModelsVisible(bool enable);
+	static void infiniteJumps(bool enable);
+	static void infiniteAirCombos(bool enable);
 
 	void setZone(std::string value);
 	void setName(std::string value);
@@ -66,7 +72,8 @@ public:
 	void setY(float value);
 	void setZ(float value);
 	void setPosition(float x, float y, float z);
-	void setActorModel(std::string model);
+	static void setActorModel(std::string model);
+	static std::string setActorModelConvert(int value);
 
 	// cheats
 	void InfiniteHealth(bool enabled);
@@ -83,6 +90,7 @@ public:
 	static int gold;
 	static std::string zone;
 	static std::string name;
+	static int forceCharSelect_num;
 
 	// saving and loading
 	static void onConfigLoad(const utils::Config& cfg);

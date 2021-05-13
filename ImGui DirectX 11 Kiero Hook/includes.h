@@ -11,6 +11,8 @@
 
 #include <thread>
 #include <iostream>
+#include <vector>
+#include <array>
 
 #include "ReplicantHook/ReplicantHook.hpp"
 

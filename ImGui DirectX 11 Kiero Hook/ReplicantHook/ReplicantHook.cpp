@@ -1,4 +1,4 @@
-#include "ReplicantHook.hpp"
+#include "ReplicantHook.hpp">
 
 // dev
 uintptr_t ReplicantHook::_baseAddress(NULL);
@@ -21,6 +21,10 @@ float ReplicantHook::z(NULL);
 // toggles
 bool ReplicantHook::cursorForceHidden_toggle(false);
 bool ReplicantHook::forceModelsVisible_toggle(false);
+bool ReplicantHook::infiniteJumps_toggle(false);
+bool ReplicantHook::infiniteAirCombos_toggle(false);
+bool ReplicantHook::forceCharSelect_toggle(false);
+int ReplicantHook::forceCharSelect_num(0);
 
 DWORD ReplicantHook::_getProcessID(void)
 {
@@ -253,6 +257,32 @@ void ReplicantHook::forceModelsVisible(bool enabled)
 	}
 }
 
+void ReplicantHook::infiniteJumps(bool enabled)
+{
+	if (enabled)
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x69EB8A), (BYTE*)"\x90\x90", 2);
+
+	}
+	else
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x69EB8A), (BYTE*)"\x84\xC0", 2);
+	}
+}
+
+void ReplicantHook::infiniteAirCombos(bool enabled)
+{
+	if (enabled)
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x6C13E8), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
+
+	}
+	else
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x6C13E8), (BYTE*)"\xFF\x84\x81\x2C\x61\x01\x00", 7);
+	}
+}
+
 void ReplicantHook::setZone(std::string value)
 {
 	ReplicantHook::writeMemoryString(0x4372794, value);
@@ -326,6 +356,24 @@ constexpr unsigned int str2int(const char* str, int h = 0)
 	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
 }
 
+std::string ReplicantHook::setActorModelConvert(int model)
+{
+	switch(model)
+	{
+		case 0:
+			return "";
+		case 1:
+			return "nierB";
+		case 2:
+			return "nierT";
+		case 3:
+			return "nierY";
+		case 4:
+			return "kaineE";
+	}
+	return "";
+}
+
 void ReplicantHook::setActorModel(std::string model)
 {
 	BYTE* modelBytes;
@@ -374,10 +422,16 @@ void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
 	cursorForceHidden(cursorForceHidden_toggle);
 	forceModelsVisible_toggle = cfg.get<bool>("forceModelsVisible").value_or(false);
 	forceModelsVisible(forceModelsVisible_toggle);
+	infiniteJumps_toggle = cfg.get<bool>("infiniteJumps").value_or(false);
+	infiniteJumps(infiniteJumps_toggle);
+	infiniteAirCombos_toggle = cfg.get<bool>("infiniteAirCombos").value_or(false);
+	infiniteAirCombos(infiniteAirCombos_toggle);
 };
 
 void ReplicantHook::onConfigSave(utils::Config& cfg) {
 	cfg.set<bool>("cursorForceHidden", cursorForceHidden_toggle);
 	cfg.set<bool>("forceModelsVisible", forceModelsVisible_toggle);
+	cfg.set<bool>("infiniteJumps", infiniteJumps_toggle);
+	cfg.set<bool>("infiniteAirCombos", infiniteAirCombos_toggle);
 	cfg.save("Replicant_Hook.cfg");
 };
