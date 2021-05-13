@@ -141,9 +141,6 @@
     <ClInclude Include="ReplicantHook\ReplicantHook.hpp">
       <Filter>ReplicantHook</Filter>
     </ClInclude>
-    <ClInclude Include="includes.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="utility\config.hpp">
       <Filter>utils</Filter>
     </ClInclude>

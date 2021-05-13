@@ -1,5 +1,23 @@
-#include "includes.h"
+//#include "includes.h"
+#define DIRECTINPUT_VERSION 0x0800
+//#include <Windows.h>
+//#include <dxgi.h>
+#include <d3d11.h>
+#include "kiero/kiero.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
+#include <dinput.h>
 
+#include <thread>
+#include <iostream>
+#include <array>
+
+#include "ReplicantHook/ReplicantHook.hpp"
+
+typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+typedef uintptr_t PTR;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -213,7 +231,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
-			ImGui::Text("Many thanks to anyone else who helped");
+			ImGui::Text("Many thanks to anyone else who helped!");
 			ImGui::Text("~Siyan");
 			ImGui::Spacing();
 			ImGui::Separator();
