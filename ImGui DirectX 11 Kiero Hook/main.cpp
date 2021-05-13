@@ -40,11 +40,12 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-constexpr std::array<const char*, 4> characterNameStrings{
-	"nierB",
-	"nierT",
-	"nierY",
-	"kaineE",
+constexpr std::array<const char*, 5> characterNameStrings{
+	"Young Nier",		// 0
+	"Prologue Nier",    // 1
+	"Old Nier",			// 2
+	"Papa Nier",		// 3
+	"Kaine"				// 4
 };
 
 bool imguiInit = false;
@@ -140,10 +141,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Separator();
 			ImGui::Spacing();
 
+			ImGui::PushItemWidth(217);
 			if (ImGui::InputInt("Gold Amount", &ReplicantHook::gold, 1, 100))
 			{
 				ReplicantHook::setGold(ReplicantHook::gold);
 			}
+			ImGui::PopItemWidth();
 
 			if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden_toggle)) // toggle
 			{
@@ -168,11 +171,18 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			{
 				ReplicantHook::infiniteAirCombos(ReplicantHook::infiniteAirCombos_toggle);
 			}
-
-			ImGui::Checkbox("Force Character Change", &ReplicantHook::forceCharSelect_toggle);
-			if (ReplicantHook::forceCharSelect_toggle)
-			{ 
-				ImGui::ListBox("##CharSelectDropdown", &ReplicantHook::forceCharSelect_num, characterNameStrings.data(), characterNameStrings.size());
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Spoilers"))
+		{
+			ImGui::Checkbox("Spoiler Warning - do not tick this unless\nyou have finished every ending.", &ReplicantHook::spoiler_toggle);
+			if (ReplicantHook::spoiler_toggle)
+			{
+				ImGui::Checkbox("Force Character Change", &ReplicantHook::forceCharSelect_toggle);
+				if (ReplicantHook::forceCharSelect_toggle)
+				{
+					ImGui::ListBox("##CharSelectDropdown", &ReplicantHook::forceCharSelect_num, characterNameStrings.data(), characterNameStrings.size());
+				}
 			}
 			ImGui::EndTabItem();
 		}
@@ -203,7 +213,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
-			ImGui::Text("And huge thanks to anyone else who helped.");
+			ImGui::Text("Many thanks to anyone else who helped.");
 			ImGui::Text("~Siyan.");
 			ImGui::Spacing();
 			ImGui::Separator();
@@ -268,7 +278,7 @@ int main()
 
 		if (&ReplicantHook::forceCharSelect_toggle)
 		{
-			ReplicantHook::setActorModel(ReplicantHook::setActorModelConvert(ReplicantHook::forceCharSelect_num));
+			ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
 		}
 
 		// std::cout << "Magic " << hook.getMagic() << std::endl;

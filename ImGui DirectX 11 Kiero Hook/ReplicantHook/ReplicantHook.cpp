@@ -25,6 +25,7 @@ bool ReplicantHook::infiniteJumps_toggle(false);
 bool ReplicantHook::infiniteAirCombos_toggle(false);
 bool ReplicantHook::forceCharSelect_toggle(false);
 int ReplicantHook::forceCharSelect_num(0);
+bool ReplicantHook::spoiler_toggle(false);
 
 DWORD ReplicantHook::_getProcessID(void)
 {
@@ -356,60 +357,9 @@ constexpr unsigned int str2int(const char* str, int h = 0)
 	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
 }
 
-std::string ReplicantHook::setActorModelConvert(int model)
+void ReplicantHook::forceCharSelect(int character)
 {
-	switch(model)
-	{
-		case 0:
-			return "";
-		case 1:
-			return "nierB";
-		case 2:
-			return "nierT";
-		case 3:
-			return "nierY";
-		case 4:
-			return "kaineE";
-	}
-	return "";
-}
-
-void ReplicantHook::setActorModel(std::string model)
-{
-	BYTE* modelBytes;
-	switch (str2int(model.c_str())) {
-	case str2int("nierB"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; // nierB
-		break;
-	case str2int("nierT"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x54\x00\x00"; // nierT
-		break;
-	case str2int("nierF"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x46\x00\x00"; // nierF
-		break;
-	case str2int("nierY"):
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x59\x00\x00"; // nierY
-		break;
-	//  case str2int("nier010"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x30"; // nier010
-		//	break;
-	//  case str2int("nier011"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x31\x31"; // nier011
-		//	break;
-	//  case str2int("nier020"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x32\x30"; // nier020
-		//	break;
-	//  case str2int("nier030"):
-		//	modelBytes = (BYTE*)"\x6E\x69\x65\x72\x30\x33\x30"; // nier030
-		//	break;
-	case str2int("kaineE"):
-		modelBytes = (BYTE*)"\x6B\x61\x69\x6E\x65\x45\x00"; // kaineE
-		break;
-	default:
-		modelBytes = (BYTE*)"\x6E\x69\x65\x72\x42\x00\x00"; // default nierB
-		break;
-	}
-	ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x0B88280), modelBytes, 7);
+	ReplicantHook::writeMemory(0x43727B8, character);
 }
 
 std::string ReplicantHook::getActorModel()
@@ -426,12 +376,18 @@ void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
 	infiniteJumps(infiniteJumps_toggle);
 	infiniteAirCombos_toggle = cfg.get<bool>("infiniteAirCombos").value_or(false);
 	infiniteAirCombos(infiniteAirCombos_toggle);
+	spoiler_toggle = cfg.get<bool>("spoiler").value_or(false);
+	forceCharSelect_toggle = cfg.get<bool>("forceCharSelect").value_or(false);
+	forceCharSelect(forceCharSelect_toggle);
+	forceCharSelect_num = cfg.get<int>("forceCharSelectNum").value_or(0);
 };
 
 void ReplicantHook::onConfigSave(utils::Config& cfg) {
 	cfg.set<bool>("cursorForceHidden", cursorForceHidden_toggle);
 	cfg.set<bool>("forceModelsVisible", forceModelsVisible_toggle);
 	cfg.set<bool>("infiniteJumps", infiniteJumps_toggle);
-	cfg.set<bool>("infiniteAirCombos", infiniteAirCombos_toggle);
+	cfg.set<bool>("spoiler", spoiler_toggle);
+	cfg.set<bool>("forceCharSelect", forceCharSelect_toggle);
+	cfg.set<int>("forceCharSelectNum", forceCharSelect_num);
 	cfg.save("Replicant_Hook.cfg");
 };

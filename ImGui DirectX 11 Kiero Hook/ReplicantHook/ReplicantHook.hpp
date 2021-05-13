@@ -53,6 +53,7 @@ public:
 	static bool infiniteJumps_toggle;
 	static bool infiniteAirCombos_toggle;
 	static bool forceCharSelect_toggle;
+	static bool spoiler_toggle;
 
 	// setters
 	static void stealCursor(bool enable);
@@ -72,8 +73,7 @@ public:
 	void setY(float value);
 	void setZ(float value);
 	void setPosition(float x, float y, float z);
-	static void setActorModel(std::string model);
-	static std::string setActorModelConvert(int value);
+	static void forceCharSelect(int character);
 
 	// cheats
 	void InfiniteHealth(bool enabled);
