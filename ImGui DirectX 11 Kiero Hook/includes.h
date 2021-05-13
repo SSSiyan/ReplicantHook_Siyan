@@ -15,6 +15,7 @@
 #include <array>
 
 #include "ReplicantHook/ReplicantHook.hpp"
+#include "imgui_layout.hpp"
 
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);

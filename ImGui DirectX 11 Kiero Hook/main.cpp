@@ -108,11 +108,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	if (GetAsyncKeyState(VK_INSERT) & 1) {
+	if (GetAsyncKeyState(VK_DELETE) & 1) {
 		OpenedHook();
 	}
 
-	if (GetAsyncKeyState(VK_DELETE) & 1)
+	if (GetAsyncKeyState(VK_INSERT) & 1)
 	{
 		ReplicantHook::cursorForceHidden_toggle =! ReplicantHook::cursorForceHidden_toggle; // toggle
 		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
@@ -153,7 +153,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 			}
 			ImGui::SameLine(0);
-			HelpMarker("Disable the cursor display while using a gamepad. This can be toggled mid play with DELETE.");
+			HelpMarker("Disable the cursor display while using a gamepad. This can be toggled mid play with INSERT.");
 
 			if (ImGui::Checkbox("Force 100% Model Visibility", &ReplicantHook::forceModelsVisible_toggle)) // toggle
 			{
@@ -213,8 +213,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
-			ImGui::Text("Many thanks to anyone else who helped.");
-			ImGui::Text("~Siyan.");
+			ImGui::Text("Many thanks to anyone else who helped");
+			ImGui::Text("~Siyan");
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
