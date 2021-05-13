@@ -76,6 +76,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		OpenedHook();
 	}
 
+	if (GetAsyncKeyState(VK_DELETE) & 1) //END button pressed
+	{
+		ReplicantHook::cursorForceHidden = !ReplicantHook::cursorForceHidden;
+		ReplicantHook::hideCursor(ReplicantHook::cursorForceHidden);
+	}
+
 	if (!imguiDraw) {
 		goto imgui_finish;
 	}
@@ -115,7 +121,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 			failed();
 		}
 	}
-	Sleep(1000); // to hook after game is loaded
+	Sleep(10000); // to hook after game is loaded
 	bool init_hook = false;
 	do
 	{
@@ -143,6 +149,7 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 	}
 	return TRUE;
 }
+
 
 //Function used to exit the program
 void ENDPressed(ReplicantHook* hook) {

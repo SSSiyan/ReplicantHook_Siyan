@@ -42,6 +42,8 @@ public:
 	void hookStatus(void);
 	void update();
 
+	static bool cursorForceHidden;
+
 	//Getters
 	bool isHooked(void); // main.cpp startup check
 	int getGold();
@@ -57,6 +59,7 @@ public:
 
 	//Setters
 	static void stealCursor(bool toggle);
+	static void hideCursor(bool toggle);
 	static void setGold(int value);
 	void setZone(std::string value);
 	void setName(std::string value);

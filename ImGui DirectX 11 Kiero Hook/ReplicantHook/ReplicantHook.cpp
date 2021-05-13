@@ -5,6 +5,8 @@ uintptr_t ReplicantHook::_baseAddress(NULL);
 DWORD ReplicantHook::_pID(NULL);
 bool ReplicantHook::_hooked(NULL);
 
+bool ReplicantHook::cursorForceHidden = false;
+
 /*
 uintptr_t ReplicantHook::actorPlayable(NULL);
 std::string ReplicantHook::zone(NULL);
@@ -223,15 +225,34 @@ void ReplicantHook::stealCursor(bool enabled)
 {
 	if (enabled) // stop the game from hiding cursor
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
-		ReplicantHook::writeMemory(0x443C1FD, true);  // show cursor
+		//ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
+		//ReplicantHook::writeMemory(0x443C1FD, true);  // old show cursor
+		ReplicantHook::writeMemory(0x443C1FF, true);  // show cursor
 		ReplicantHook::writeMemory(0x443C1FE, false); // disable game input
+		
 	}
 	else		// allow the game to hide cursor
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\xC6\x86\x8D\x00\x00\x00\x00", 7);
-		ReplicantHook::writeMemory(0x443C1FD, false); // hide cursor
+		//ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\xC6\x86\x8D\x00\x00\x00\x00", 7);
+		//ReplicantHook::writeMemory(0x443C1FD, false); // old hide cursor
+		ReplicantHook::writeMemory(0x443C1FF, false); // hide cursor
 		ReplicantHook::writeMemory(0x443C1FE, true);  // enable game input
+	}
+}
+
+void ReplicantHook::hideCursor(bool enabled)
+{
+	if (enabled)		// allow the game to hide cursor
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D3499), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
+		//ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
+		ReplicantHook::writeMemory(0x443C1FF, false); // hide cursor
+	}
+	else				// stop the game from hiding cursor
+	{
+		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D3499), (BYTE*)"\x40\x88\xB3\x8F\x00\x00\x00", 7);
+		//ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D2277), (BYTE*)"\xC6\x86\x8D\x00\x00\x00\x00", 7);
+		ReplicantHook::writeMemory(0x443C1FF, true);  // show cursor
 	}
 }
 
