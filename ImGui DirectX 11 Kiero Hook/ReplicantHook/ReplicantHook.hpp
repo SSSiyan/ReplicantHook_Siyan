@@ -76,10 +76,10 @@ public:
 	void setMagic(float value);
 	void setLevel(int value);
 	void setPlaytime(double value);
-	void setX(float value);
-	void setY(float value);
-	void setZ(float value);
-	void setPosition(float x, float y, float z);
+	static void setX(float value);
+	static void setY(float value);
+	static void setZ(float value);
+	static void setPosition(float x, float y, float z);
 	static void forceCharSelect(int character);
 
 	// cheats
@@ -98,6 +98,7 @@ public:
 	static std::string zone;
 	static std::string name;
 	static int forceCharSelect_num;
+	static float xyzpos[3];
 	// static int charBackup;
 
 	// saving and loading

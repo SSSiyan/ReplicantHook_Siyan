@@ -1,4 +1,5 @@
-#include "ReplicantHook.hpp">
+#include "ReplicantHook.hpp"
+#include <vector>
 
 // dev
 uintptr_t ReplicantHook::_baseAddress(NULL);
@@ -18,6 +19,8 @@ double ReplicantHook::playtime(NULL);
 float ReplicantHook::x(NULL);
 float ReplicantHook::y(NULL);
 float ReplicantHook::z(NULL);
+float ReplicantHook::xyzpos[3]{ 0.0f, 0.0f, 0.0f };
+
 // int ReplicantHook::charBackup(NULL);
 
 // toggles
@@ -100,9 +103,9 @@ void ReplicantHook::_unHook(void)
 	ReplicantHook::magic = 0.0f;
 	ReplicantHook::level = 0;
 	ReplicantHook::playtime = 0.0;
-	ReplicantHook::x = 0;
-	ReplicantHook::y = 0;
-	ReplicantHook::z = 0;
+	//ReplicantHook::x = 0;
+	//ReplicantHook::y = 0;
+	//ReplicantHook::z = 0;
 	ReplicantHook::InfiniteMagic(false);
 }
 
@@ -146,7 +149,7 @@ void ReplicantHook::hookStatus(void)
 
 void ReplicantHook::update()
 {
-	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D0);
+	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D8);
 	ReplicantHook::gold = readMemory<int>(0x437284C);
 	ReplicantHook::XP = readMemory<int>(0x4372800);
 	ReplicantHook::zone = readMemoryString(0x4372794);
@@ -155,9 +158,12 @@ void ReplicantHook::update()
 	ReplicantHook::magic = readMemory<float>(0x43727E8);
 	ReplicantHook::level = readMemory<int>(0x43727F4);
 	ReplicantHook::playtime = readMemory<double>(0x4372C30);
-	ReplicantHook::x = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
-	ReplicantHook::y = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
-	ReplicantHook::z = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
+	ReplicantHook::x = readMemory<float>(ReplicantHook::actorPlayable + 0x9C);
+	ReplicantHook::y = readMemory<float>(ReplicantHook::actorPlayable + 0xAC);
+	ReplicantHook::z = readMemory<float>(ReplicantHook::actorPlayable + 0xBC);
+	ReplicantHook::xyzpos[0] = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
+	ReplicantHook::xyzpos[1] = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
+	ReplicantHook::xyzpos[2] = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
 }
 
 bool ReplicantHook::isHooked(void)
@@ -207,17 +213,17 @@ double ReplicantHook::getPlaytime()
 
 float ReplicantHook::getX()
 {
-	return ReplicantHook::x;
+	return (ReplicantHook::xyzpos[0]);
 }
 
 float ReplicantHook::getY()
 {
-	return ReplicantHook::y;
+	return ReplicantHook::xyzpos[1];
 }
 
 float ReplicantHook::getZ()
 {
-	return ReplicantHook::z;
+	return ReplicantHook::xyzpos[2];
 }
 
 void ReplicantHook::stealCursor(bool enabled)

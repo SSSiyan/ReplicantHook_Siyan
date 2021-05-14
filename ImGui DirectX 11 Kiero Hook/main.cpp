@@ -13,7 +13,7 @@
 #include <thread>
 #include <iostream>
 #include <array>
-
+#include <vector>
 #include "ReplicantHook/ReplicantHook.hpp"
 
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
@@ -162,8 +162,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		if (ImGui::BeginTabItem("General"))
 		{
 			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
 			ImGui::TextWrapped("WARNING: PLEASE BACK UP YOUR SAVEDATA BEFORE USING THIS HOOK.");
 			ImGui::TextWrapped("I haven't had any save corruption issues, but this is a long game and "
 				"I would hate for anyone to lose their saves because of me.");
@@ -176,10 +174,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				HRESULT result = SHGetFolderPathAndSubDirA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, myGames, saveGameLocation);
 				ShellExecuteA(NULL, "open", saveGameLocation, NULL, NULL, SW_SHOWNORMAL);
 			}
-			ImGui::Spacing(); 
-			ImGui::Text("System");
 			ImGui::Spacing();
 			ImGui::Separator();
+			ImGui::Spacing(); 
+			ImGui::Text("System");
 			ImGui::Spacing();
 
 			if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden_toggle)) // toggle
@@ -197,9 +195,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			HelpMarker("Stop models becoming transparent when the camera gets too close");
 
 			ImGui::Spacing();
-			ImGui::Text("Cheats");
-			ImGui::Spacing();
 			ImGui::Separator();
+			ImGui::Spacing();
+			ImGui::Text("Cheats");
 			ImGui::Spacing();
 
 			ImGui::PushItemWidth(180);
@@ -220,9 +218,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			}
 
 			ImGui::Spacing();
-			ImGui::Text("Gameplay");
-			ImGui::Spacing();
 			ImGui::Separator();
+			ImGui::Spacing();
+			ImGui::Text("Gameplay");
 			ImGui::Spacing();
 
 			// using SameLine(170)
@@ -241,10 +239,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ReplicantHook::infiniteJumps(ReplicantHook::infiniteJumps_toggle);
 			}
 
+			//ImGui::PushItemWidth(180);
+			//std::vector <float[3]> xyzfloat xyzvec[3] = { ReplicantHook::x, ReplicantHook::y, ReplicantHook::z };
+
+			if (ImGui::InputFloat3("Player Position", ReplicantHook::xyzpos))
+			{
+				ReplicantHook::setPosition(ReplicantHook::xyzpos[0], ReplicantHook::xyzpos[1], ReplicantHook::xyzpos[2]);
+			}
+
+			ImGui::DragFloat("PlayerPosX", &ReplicantHook::x);
+
+			//ImGui::PopItemWidth();
+
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Spoilers"))
 		{
+			ImGui::Spacing();
 			ImGui::Checkbox("Spoiler Warning - do not tick this unless\nyou have finished every ending.", &ReplicantHook::spoiler_toggle);
 			if (ReplicantHook::spoiler_toggle)
 			{
@@ -266,11 +277,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		}
 
 		if (ImGui::BeginTabItem("Credits"))
+
 		{
-			ImGui::Spacing();
-			ImGui::Text("Thanks!");
-			ImGui::Spacing();
-			ImGui::Separator();
 			ImGui::Spacing();
 			ImGui::Text("This hook is based off ReplicantHook by Asiern:\n");
 			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "https://github.com/Asiern/ReplicantHook");
@@ -293,9 +301,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Spacing();
 			ImGui::Text("Many thanks to anyone else who helped!");
 			ImGui::Text("~Siyan");
-			ImGui::Spacing();
-			ImGui::Separator();
-			ImGui::Spacing();
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
