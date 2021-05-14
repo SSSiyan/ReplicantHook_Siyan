@@ -36,6 +36,7 @@ public:
 	// getters
 	bool isHooked(void); // main.cpp startup check
 	static int getGold();
+	static int getXP();
 	static std::string getZone();
 	static std::string getName();
 	int getHealth();
@@ -45,7 +46,7 @@ public:
 	float getX();
 	float getY();
 	float getZ();
-	std::string getActorModel();
+	// static void getCharBackup();
 
 	// toggles
 	static bool cursorForceHidden_toggle;
@@ -54,14 +55,20 @@ public:
 	static bool infiniteAirCombos_toggle;
 	static bool forceCharSelect_toggle;
 	static bool spoiler_toggle;
+	static bool takeNoDamage_toggle;
+	static bool dealNoDamage_toggle;
 
 	// setters
-	static void stealCursor(bool enable);
-	static void cursorForceHidden(bool enable);
+	static void stealCursor(bool enabled);
+	static void cursorForceHidden(bool enabled);
 	static void setGold(int value);
-	static void forceModelsVisible(bool enable);
-	static void infiniteJumps(bool enable);
-	static void infiniteAirCombos(bool enable);
+	static void setXP(int value);
+	static void forceModelsVisible(bool enabled);
+	static void infiniteJumps(bool enabled);
+	static void infiniteAirCombos(bool enabled);
+	static void dealNoDamage(bool enabled);
+	static void takeNoDamage(bool enabled);
+
 
 	void setZone(std::string value);
 	void setName(std::string value);
@@ -76,7 +83,6 @@ public:
 	static void forceCharSelect(int character);
 
 	// cheats
-	void InfiniteHealth(bool enabled);
 	void InfiniteMagic(bool enabled);
 
 	// values
@@ -88,9 +94,11 @@ public:
 	static float y;
 	static float z;
 	static int gold;
+	static int XP;
 	static std::string zone;
 	static std::string name;
 	static int forceCharSelect_num;
+	// static int charBackup;
 
 	// saving and loading
 	static void onConfigLoad(const utils::Config& cfg);

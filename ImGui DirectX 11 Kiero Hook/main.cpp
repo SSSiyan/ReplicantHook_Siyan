@@ -8,6 +8,7 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
 #include <dinput.h>
+#include <shlobj_core.h>
 
 #include <thread>
 #include <iostream>
@@ -99,7 +100,7 @@ void OpenedHook() // called when the user opens or closes imgui
 	else
 	{
 		ReplicantHook::stealCursor(0);
-		ReplicantHook::onConfigSave(cfg); // save config on hook close
+		// ReplicantHook::onConfigSave(cfg); // save config on hook close
 	}
 }
 
@@ -146,49 +147,100 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
 
-	ImGui::Begin("REPLICANT_HOOK_SIYAN_0.1", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("REPLICANT_HOOK_SIYAN_0.2", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	// check [SECTION] MAIN USER FACING STRUCTURES (ImGuiStyle, ImGuiIO) @ imgui.cpp
+
+	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::SameLine(260);
+	if (ImGui::Button("Save config"))
+	{
+		ReplicantHook::onConfigSave(cfg);
+	}
 
 	if (ImGui::BeginTabBar("Trainer", ImGuiTabBarFlags_FittingPolicyScroll))
 	{
 		if (ImGui::BeginTabItem("General"))
 		{
 			ImGui::Spacing();
-			ImGui::Text("General");
+			ImGui::Separator();
+			ImGui::Spacing();
+			ImGui::TextWrapped("WARNING: PLEASE BACK UP YOUR SAVEDATA BEFORE USING THIS HOOK.");
+			ImGui::TextWrapped("I haven't had any save corruption issues, but this is a long game and "
+				"I would hate for anyone to lose their saves because of me.");
+			ImGui::TextWrapped("By default your save is found here:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "My Games");
+			if (ImGui::IsItemClicked()) {
+				TCHAR saveGameLocation[MAX_PATH];
+				TCHAR myGames[MAX_PATH] = "My Games";
+				HRESULT result = SHGetFolderPathAndSubDirA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, myGames, saveGameLocation);
+				ShellExecuteA(NULL, "open", saveGameLocation, NULL, NULL, SW_SHOWNORMAL);
+			}
+			ImGui::Spacing(); 
+			ImGui::Text("System");
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
-
-			ImGui::PushItemWidth(217);
-			if (ImGui::InputInt("Gold Amount", &ReplicantHook::gold, 1, 100))
-			{
-				ReplicantHook::setGold(ReplicantHook::gold);
-			}
-			ImGui::PopItemWidth();
 
 			if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden_toggle)) // toggle
 			{
 				ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 			}
-			ImGui::SameLine(0);
+			ImGui::SameLine();
 			HelpMarker("Disable the cursor display while using a gamepad. This can be toggled mid play with INSERT.");
 
 			if (ImGui::Checkbox("Force 100% Model Visibility", &ReplicantHook::forceModelsVisible_toggle)) // toggle
 			{
 				ReplicantHook::forceModelsVisible(ReplicantHook::forceModelsVisible_toggle);
 			}
-			ImGui::SameLine(0);
+			ImGui::SameLine();
 			HelpMarker("Stop models becoming transparent when the camera gets too close");
+
+			ImGui::Spacing();
+			ImGui::Text("Cheats");
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Spacing();
+
+			ImGui::PushItemWidth(180);
+			if (ImGui::InputInt("Gold Amount", &ReplicantHook::gold, 1, 100))
+			{
+				ReplicantHook::setGold(ReplicantHook::gold);
+			}
+
+			if (ImGui::InputInt("Character XP", &ReplicantHook::XP, 1, 100))
+			{
+				ReplicantHook::setXP(ReplicantHook::XP);
+			}
+			ImGui::PopItemWidth();
+
+			if (ImGui::Checkbox("Take No Damage", &ReplicantHook::takeNoDamage_toggle)) // toggle
+			{
+				ReplicantHook::takeNoDamage(ReplicantHook::takeNoDamage_toggle);
+			}
+
+			ImGui::Spacing();
+			ImGui::Text("Gameplay");
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Spacing();
+
+			// using SameLine(170)
+			if (ImGui::Checkbox("Deal No Damage", &ReplicantHook::dealNoDamage_toggle)) // toggle
+			{
+				ReplicantHook::dealNoDamage(ReplicantHook::dealNoDamage_toggle);
+			}
+
+			if (ImGui::Checkbox("Infinite Air Combos and Dashes", &ReplicantHook::infiniteAirCombos_toggle)) // toggle
+			{
+				ReplicantHook::infiniteAirCombos(ReplicantHook::infiniteAirCombos_toggle);
+			}
 
 			if (ImGui::Checkbox("Infinite Jumps", &ReplicantHook::infiniteJumps_toggle)) // toggle
 			{
 				ReplicantHook::infiniteJumps(ReplicantHook::infiniteJumps_toggle);
 			}
 
-			if (ImGui::Checkbox("Infinite Air Combos", &ReplicantHook::infiniteAirCombos_toggle)) // toggle
-			{
-				ReplicantHook::infiniteAirCombos(ReplicantHook::infiniteAirCombos_toggle);
-			}
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Spoilers"))
@@ -199,8 +251,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ImGui::Checkbox("Force Character Change", &ReplicantHook::forceCharSelect_toggle);
 				if (ReplicantHook::forceCharSelect_toggle)
 				{
-					ImGui::ListBox("##CharSelectDropdown", &ReplicantHook::forceCharSelect_num, characterNameStrings.data(), characterNameStrings.size());
+					ImGui::PushItemWidth(180);
+					// set forceCharSelect_num to desired character. This is set every 500ms in int main() because the game sets it back every load screen
+					ImGui::Combo("##CharSelectDropdown", &ReplicantHook::forceCharSelect_num, characterNameStrings.data(), characterNameStrings.size());
+					ImGui::PopItemWidth();
 				}
+				/*else
+				{
+					// reapply the character the user was playing as before applying the cheat
+					ReplicantHook::forceCharSelect(ReplicantHook::charBackup);
+				}*/
 			}
 			ImGui::EndTabItem();
 		}
@@ -269,15 +329,17 @@ int main()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //Look for memory leaks
 
 	ReplicantHook hook = ReplicantHook();
-	std::cout << "Replicant Hook\n";
-	std::cout << "Hooking..." << std::endl;
+	// std::cout << "Replicant Hook\n";
+	// std::cout << "Hooking..." << std::endl;
+
 	// hook to process
 	while (!hook.isHooked()) {
 		hook.start();
 		Sleep(500);
 	}
+
 	// now hooked
-	std::cout << "Hooked" << std::endl;
+	// std::cout << "Hooked" << std::endl;
 	ReplicantHook::onConfigLoad(cfg);
 
 	// enable some cheats
@@ -290,15 +352,15 @@ int main()
 	// create a thread to exit when the 'END' button is pressed
 	// std::thread exitThread(ENDPressed, &hook);
 
-	// print some values
 	while (hook.isHooked()) {
 		hook.update();
-
-		if (&ReplicantHook::forceCharSelect_toggle)
+		
+		if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
 		{
 			ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
 		}
 
+		// print some values
 		// std::cout << "Magic " << hook.getMagic() << std::endl;
 		// std::cout << "Health " << hook.getHealth() << std::endl;
 		// std::cout << "Gold " << hook.getGold() << std::endl;
