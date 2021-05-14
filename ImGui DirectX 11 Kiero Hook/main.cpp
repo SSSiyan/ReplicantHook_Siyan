@@ -151,7 +151,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	// check [SECTION] MAIN USER FACING STRUCTURES (ImGuiStyle, ImGuiIO) @ imgui.cpp
 
 	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::SameLine(260);
+	ImGui::SameLine(300);
 	if (ImGui::Button("Save config"))
 	{
 		ReplicantHook::onConfigSave(cfg);
@@ -239,15 +239,16 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ReplicantHook::infiniteJumps(ReplicantHook::infiniteJumps_toggle);
 			}
 
-			//ImGui::PushItemWidth(180);
-			//std::vector <float[3]> xyzfloat xyzvec[3] = { ReplicantHook::x, ReplicantHook::y, ReplicantHook::z };
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Spacing();
+			ImGui::Text("Reference");
+			ImGui::Spacing();
 
 			if (ImGui::InputFloat3("Player Position", ReplicantHook::xyzpos))
 			{
 				ReplicantHook::setPosition(ReplicantHook::xyzpos[0], ReplicantHook::xyzpos[1], ReplicantHook::xyzpos[2]);
 			}
-
-			ImGui::DragFloat("PlayerPosX", &ReplicantHook::x);
 
 			//ImGui::PopItemWidth();
 
@@ -359,12 +360,6 @@ int main()
 
 	while (hook.isHooked()) {
 		hook.update();
-		
-		if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
-		{
-			ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-		}
-
 		// print some values
 		// std::cout << "Magic " << hook.getMagic() << std::endl;
 		// std::cout << "Health " << hook.getHealth() << std::endl;

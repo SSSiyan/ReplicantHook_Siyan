@@ -21,6 +21,8 @@ private:
 	template <typename T>
 	static T readMemory(uintptr_t address);
 	template <typename T>
+	static T readMemoryPointer(uintptr_t address);
+	template <typename T>
 	static void writeMemory(uintptr_t address, T value);
 	static std::string readMemoryString(uintptr_t address);
 	static void writeMemoryString(uintptr_t address, std::string value);
@@ -112,6 +114,16 @@ inline T ReplicantHook::readMemory(uintptr_t address)
 	T value;
 	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
 	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return value;
+}
+
+template<typename T>
+inline T ReplicantHook::readMemoryPointer(uintptr_t address)
+{
+	T value;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(address), &value, sizeof(value), NULL);
 	CloseHandle(pHandle); // close handle to prevent memory leaks
 	return value;
 }

@@ -16,9 +16,6 @@ int ReplicantHook::health(NULL);
 float ReplicantHook::magic(NULL);
 int ReplicantHook::level(NULL);
 double ReplicantHook::playtime(NULL);
-float ReplicantHook::x(NULL);
-float ReplicantHook::y(NULL);
-float ReplicantHook::z(NULL);
 float ReplicantHook::xyzpos[3]{ 0.0f, 0.0f, 0.0f };
 
 // int ReplicantHook::charBackup(NULL);
@@ -103,9 +100,6 @@ void ReplicantHook::_unHook(void)
 	ReplicantHook::magic = 0.0f;
 	ReplicantHook::level = 0;
 	ReplicantHook::playtime = 0.0;
-	//ReplicantHook::x = 0;
-	//ReplicantHook::y = 0;
-	//ReplicantHook::z = 0;
 	ReplicantHook::InfiniteMagic(false);
 }
 
@@ -158,12 +152,18 @@ void ReplicantHook::update()
 	ReplicantHook::magic = readMemory<float>(0x43727E8);
 	ReplicantHook::level = readMemory<int>(0x43727F4);
 	ReplicantHook::playtime = readMemory<double>(0x4372C30);
-	ReplicantHook::x = readMemory<float>(ReplicantHook::actorPlayable + 0x9C);
-	ReplicantHook::y = readMemory<float>(ReplicantHook::actorPlayable + 0xAC);
-	ReplicantHook::z = readMemory<float>(ReplicantHook::actorPlayable + 0xBC);
-	ReplicantHook::xyzpos[0] = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
-	ReplicantHook::xyzpos[1] = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
-	ReplicantHook::xyzpos[2] = readMemory<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
+	if (ReplicantHook::actorPlayable != 0)
+	{
+		ReplicantHook::xyzpos[0] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
+		ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
+		ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
+	}
+
+	// if char select is enabled, write the char every 500ms
+	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
+	{
+		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+	}
 }
 
 bool ReplicantHook::isHooked(void)
@@ -213,7 +213,7 @@ double ReplicantHook::getPlaytime()
 
 float ReplicantHook::getX()
 {
-	return (ReplicantHook::xyzpos[0]);
+	return ReplicantHook::xyzpos[0];
 }
 
 float ReplicantHook::getY()
