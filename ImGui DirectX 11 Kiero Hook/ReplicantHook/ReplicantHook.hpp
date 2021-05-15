@@ -11,7 +11,7 @@ private:
 	static DWORD _pID;
 	static uintptr_t _baseAddress;
 	static uintptr_t actorPlayable;
-	static bool _hooked;
+	
 
 	DWORD _getProcessID(void);
 	uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
@@ -34,6 +34,7 @@ public:
 	void stop(void);
 	void hookStatus(void);
 	void update();
+	static bool _hooked;
 
 	// getters
 	bool isHooked(void); // main.cpp startup check
@@ -83,6 +84,7 @@ public:
 	static void setZ(float value);
 	static void setPosition(float x, float y, float z);
 	static void forceCharSelect(int character);
+	static void forceEndgameStats(bool enabled);
 
 	// cheats
 	void InfiniteMagic(bool enabled);

@@ -163,7 +163,17 @@ void ReplicantHook::update()
 	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
 	{
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+		if (ReplicantHook::forceCharSelect_num == 4)
+		{
+			ReplicantHook::forceEndgameStats(true);
+		}
 	}
+}
+
+void ReplicantHook::forceEndgameStats(bool enabled)
+{
+	ReplicantHook::writeMemory(0x4358CB0, enabled);
 }
 
 bool ReplicantHook::isHooked(void)
