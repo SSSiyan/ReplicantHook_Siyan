@@ -1,5 +1,7 @@
 # ReplicantHook_Siyan
 <a href="https://github.com/Asiern/ReplicantHook">ReplicantHook</a> with added features and ImGui implementation through DirectX 11 Hook (kiero)
+<h2>Kiero</h2>
+<p>You can find Kiero's official repository <a href="https://github.com/Rebzzel/kiero">here</a>
 <h2>Installation</h2>
 <ul>
   <li>Download "dinput8.dll" from the latest release <a href="https://github.com/SSSiyan/ReplicantHook_Siyan/releases">here</a></li>
@@ -7,5 +9,3 @@
   <li>Open the game as you usually would through steam. After a few seconds, you'll be able to open the hook with the DELETE key</li>
   <li>You can save your settings by pressing the "Save config" button, and your settings will be automatically loaded next time you open the game</li>
 </ul>
-<h2>Kiero</h2>
-<p>You can find Kiero's official repository <a href="https://github.com/Rebzzel/kiero">here</a>
