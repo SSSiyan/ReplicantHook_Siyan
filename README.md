@@ -1,5 +1,7 @@
 # ReplicantHook_Siyan
 <a href="https://github.com/Asiern/ReplicantHook">ReplicantHook</a> with added features and ImGui implementation through <a href="https://github.com/Rebzzel/kiero">DirectX 11 Hook (kiero)</a>
+<h2>Features</h2>
+Check out the <a href="https://github.com/SSSiyan/ReplicantHook_Siyan/wiki/Feature-List">feature list</a>
 <h2>Installation</h2>
 <ul>
   <li>Download "dinput8.dll" from the latest release <a href="https://github.com/SSSiyan/ReplicantHook_Siyan/releases">here</a></li>
