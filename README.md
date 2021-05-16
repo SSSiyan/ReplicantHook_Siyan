@@ -1,6 +1,6 @@
 # ReplicantHook_Siyan
 <a href="https://github.com/Asiern/ReplicantHook">ReplicantHook</a> with added features and ImGui implementation through DirectX 11 Hook (kiero)
-<h1>Installation</h1>
+<h2>Installation</h2>
 <ul>
   <li>Download "dinput8.dll" from the latest release <a href="https://github.com/SSSiyan/ReplicantHook_Siyan/releases">here</a></li>
   <li>Place "dinput8.dll" next to your game's exe, usually located at D:\Steam\steamapps\common\NieR Replicant ver.1.22474487139</li>
