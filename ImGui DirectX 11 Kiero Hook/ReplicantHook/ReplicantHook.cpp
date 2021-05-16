@@ -18,9 +18,7 @@ int ReplicantHook::level(NULL);
 double ReplicantHook::playtime(NULL);
 float ReplicantHook::xyzpos[3]{ 0.0f, 0.0f, 0.0f };
 
-// int ReplicantHook::charBackup(NULL);
-
-// toggles
+// toggle bools
 bool ReplicantHook::cursorForceHidden_toggle(false);
 bool ReplicantHook::forceModelsVisible_toggle(false);
 bool ReplicantHook::infiniteJumps_toggle(false);
@@ -75,7 +73,7 @@ uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName
 	return modBaseAddr;
 }
 
-// hook nier
+// hook game
 void ReplicantHook::_hook(void)
 {
 	DWORD ID = ReplicantHook::_getProcessID();
@@ -86,7 +84,7 @@ void ReplicantHook::_hook(void)
 	ReplicantHook::_hooked = true;
 }
 
-// unhook nier
+// unhook game
 void ReplicantHook::_unHook(void)
 {
 	ReplicantHook::_hooked = false;
@@ -112,6 +110,52 @@ void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
 	VirtualProtectEx(pHandle, destination, size, oldprotection, &oldprotection);
 	CloseHandle(pHandle);
 }
+
+template<typename T>
+inline T ReplicantHook::readMemory(uintptr_t address)
+{
+	T value;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return value;
+}
+
+template<typename T>
+inline T ReplicantHook::readMemoryPointer(uintptr_t address)
+{
+	T value;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return value;
+}
+
+template<typename T>
+inline void ReplicantHook::writeMemory(uintptr_t address, T value)
+{
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, NULL, ReplicantHook::_pID);
+	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle);
+}
+
+inline std::string ReplicantHook::readMemoryString(uintptr_t address)
+{
+	char val[20];
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return std::string(val);
+}
+
+inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
+{
+	SIZE_T BytesToWrite = value.length() + 1;
+	SIZE_T BytesWritten;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
+}
+
 
 DWORD ReplicantHook::getProcessID(void)
 {
@@ -141,6 +185,7 @@ void ReplicantHook::hookStatus(void)
 	}
 }
 
+// called on tick
 void ReplicantHook::update()
 {
 	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D8);
@@ -152,18 +197,20 @@ void ReplicantHook::update()
 	ReplicantHook::magic = readMemory<float>(0x43727E8);
 	ReplicantHook::level = readMemory<int>(0x43727F4);
 	ReplicantHook::playtime = readMemory<double>(0x4372C30);
-	if (ReplicantHook::actorPlayable != 0)
-	{
+	//if (ReplicantHook::actorPlayable != 0)
+	//{
 		ReplicantHook::xyzpos[0] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
 		ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
 		ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
-	}
+	//}
 
-	// if char select is enabled, write the char every 500ms
+	// if char select is enabled, write the char
 	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
 	{
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+
+		// if character is 4, force old save stats
 		if (ReplicantHook::forceCharSelect_num == 4)
 		{
 			ReplicantHook::forceEndgameStats(true);
@@ -265,16 +312,6 @@ void ReplicantHook::cursorForceHidden(bool enabled) // disables the game display
 	}
 }
 
-void ReplicantHook::setGold(int value)
-{
-	ReplicantHook::writeMemory(0x437284C, value);
-}
-
-void ReplicantHook::setXP(int value)
-{
-	ReplicantHook::writeMemory(0x4372800, value);
-}
-
 void ReplicantHook::forceModelsVisible(bool enabled)
 {
 	if (enabled)
@@ -312,6 +349,16 @@ void ReplicantHook::infiniteAirCombos(bool enabled)
 	{
 		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x6C13E8), (BYTE*)"\xFF\x84\x81\x2C\x61\x01\x00", 7);
 	}
+}
+
+void ReplicantHook::setGold(int value)
+{
+	ReplicantHook::writeMemory(0x437284C, value);
+}
+
+void ReplicantHook::setXP(int value)
+{
+	ReplicantHook::writeMemory(0x4372800, value);
 }
 
 void ReplicantHook::setZone(std::string value)
@@ -359,13 +406,6 @@ void ReplicantHook::setZ(float value)
 	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0xBC, value);
 }
 
-void ReplicantHook::setPosition(float x, float y, float z)
-{
-	ReplicantHook::setX(x);
-	ReplicantHook::setY(y);
-	ReplicantHook::setZ(z);
-}
-
 void ReplicantHook::takeNoDamage(bool enabled)
 {
 	if (enabled)
@@ -390,20 +430,15 @@ void ReplicantHook::dealNoDamage(bool enabled)
 		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x2A5CBE), (BYTE*)"\x89\xBB\xEC\x02\x00\x00", 6);
 }
 
-constexpr unsigned int str2int(const char* str, int h = 0)
-{
-	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
-}
-
 void ReplicantHook::forceCharSelect(int character)
 {
 	ReplicantHook::writeMemory(0x43727B8, character);
 }
 
-/*void ReplicantHook::getCharBackup()
+constexpr unsigned int str2int(const char* str, int h = 0)
 {
-	ReplicantHook::charBackup = ReplicantHook::readMemory<int>(0x43727B8);
-}*/
+	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+}
 
 void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
 	cursorForceHidden_toggle = cfg.get<bool>("cursorForceHidden").value_or(false);

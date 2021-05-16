@@ -82,7 +82,6 @@ public:
 	static void setX(float value);
 	static void setY(float value);
 	static void setZ(float value);
-	static void setPosition(float x, float y, float z);
 	static void forceCharSelect(int character);
 	static void forceEndgameStats(bool enabled);
 
@@ -109,48 +108,3 @@ public:
 	static void onConfigLoad(const utils::Config& cfg);
 	static void onConfigSave(utils::Config& cfg);
 };
-
-template<typename T>
-inline T ReplicantHook::readMemory(uintptr_t address)
-{
-	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return value;
-}
-
-template<typename T>
-inline T ReplicantHook::readMemoryPointer(uintptr_t address)
-{
-	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return value;
-}
-
-template<typename T>
-inline void ReplicantHook::writeMemory(uintptr_t address, T value)
-{
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, NULL, ReplicantHook::_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle);
-}
-
-inline std::string ReplicantHook::readMemoryString(uintptr_t address)
-{
-	char val[20];
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return std::string(val);
-}
-
-inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
-{
-	SIZE_T BytesToWrite = value.length() + 1;
-	SIZE_T BytesWritten;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
-}

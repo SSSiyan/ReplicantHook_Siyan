@@ -80,6 +80,9 @@
     <ClCompile Include="utils\config.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="main2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="kiero\minhook\dll_resources\MinHook.rc">
@@ -161,6 +164,9 @@
     </ClInclude>
     <ClInclude Include="C:\vs_projects\dmc4_hook\src\dmc4_hook\utils\Timer.hpp">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="main2.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

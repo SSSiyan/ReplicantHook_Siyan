@@ -15,6 +15,9 @@
 #include <array>
 #include <vector>
 #include "ReplicantHook/ReplicantHook.hpp"
+#include "main2.hpp"
+
+static utils::Config cfg{ "replicant_hook.cfg" };
 
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
@@ -28,7 +31,6 @@ WNDPROC oWndProc;
 ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
 ID3D11RenderTargetView* mainRenderTargetView;
-
 
 HMODULE g_dinput = 0;
 extern "C" {
@@ -61,8 +63,6 @@ constexpr std::array<const char*, 5> characterNameStrings{
 bool imguiInit = false;
 bool imguiDraw = false;
 
-utils::Config cfg{ "replicant_hook.cfg" };
-
 static void HelpMarker(const char* desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -91,16 +91,12 @@ void OpenedHook() // called when the user opens or closes imgui
 	imguiDraw = !imguiDraw;
 	if (imguiDraw)
 	{
+		// update() gets values every 500ms
 		ReplicantHook::stealCursor(1);
-		// update values // update() does this every 500ms
-		// ReplicantHook::getGold();
-		// ReplicantHook::getZone();
-		// ReplicantHook::getZone();
 	}
 	else
 	{
 		ReplicantHook::stealCursor(0);
-		// ReplicantHook::onConfigSave(cfg); // save config on hook close
 	}
 }
 
@@ -127,13 +123,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
+	// open menu
 	if (GetAsyncKeyState(VK_DELETE) & 1) {
 		OpenedHook();
 	}
 
+	// toggle gamepad cursor display
 	if (GetAsyncKeyState(VK_INSERT) & 1)
 	{
-		ReplicantHook::cursorForceHidden_toggle =! ReplicantHook::cursorForceHidden_toggle; // toggle
+		ReplicantHook::cursorForceHidden_toggle =! ReplicantHook::cursorForceHidden_toggle;
 		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 	}
 
@@ -146,7 +144,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::NewFrame();
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
 
-	ImGui::Begin("REPLICANT_HOOK_SIYAN_0.2", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("REPLICANT_HOOK_SIYAN_0.3", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	// check [SECTION] MAIN USER FACING STRUCTURES (ImGuiStyle, ImGuiIO) @ imgui.cpp
 
 	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -222,7 +220,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Text("Gameplay");
 			ImGui::Spacing();
 
-			// using SameLine(170)
+			// using SameLine(170) for buttons and (180) for dropdowns etc
 			if (ImGui::Checkbox("Deal No Damage", &ReplicantHook::dealNoDamage_toggle)) // toggle
 			{
 				ReplicantHook::dealNoDamage(ReplicantHook::dealNoDamage_toggle);
@@ -244,12 +242,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Text("Reference");
 			ImGui::Spacing();
 
-			if (ImGui::InputFloat3("Player Position", ReplicantHook::xyzpos))
-			{
-				ReplicantHook::setPosition(ReplicantHook::xyzpos[0], ReplicantHook::xyzpos[1], ReplicantHook::xyzpos[2]);
-			}
-
-			//ImGui::PopItemWidth();
+			ImGui::InputFloat3("Player Position", ReplicantHook::xyzpos);
 
 			ImGui::EndTabItem();
 		}
@@ -263,15 +256,9 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				if (ReplicantHook::forceCharSelect_toggle)
 				{
 					ImGui::PushItemWidth(180);
-					// set forceCharSelect_num to desired character. This is set every 500ms in int main() because the game sets it back every load screen
 					ImGui::Combo("##CharSelectDropdown", &ReplicantHook::forceCharSelect_num, characterNameStrings.data(), characterNameStrings.size());
 					ImGui::PopItemWidth();
 				}
-				/*else
-				{
-					// reapply the character the user was playing as before applying the cheat
-					ReplicantHook::forceCharSelect(ReplicantHook::charBackup);
-				}*/
 			}
 			ImGui::EndTabItem();
 		}
@@ -313,66 +300,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 imgui_finish:
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
-/*
-// exit the program
-void ENDPressed(ReplicantHook* hook) {
-	while (true) {
-		if (GetKeyState(VK_END) & 0x8000)
-		{
-			// disable cheats
-			hook->InfiniteHealth(false);
-			hook->InfiniteMagic(false);
-			// stop hook
-			hook->stop();
-			return;
-		}
-	}
-}
-*/
-int main()
-{
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //Look for memory leaks
-
-	ReplicantHook hook = ReplicantHook();
-	// std::cout << "Replicant Hook\n";
-	// std::cout << "Hooking..." << std::endl;
-
-	// hook to process
-	while (!hook.isHooked()) {
-		hook.start();
-		Sleep(500);
-	}
-
-	// now hooked
-	// std::cout << "Hooked" << std::endl;
-	ReplicantHook::onConfigLoad(cfg);
-
-	// enable some cheats
-	// hook.InfiniteHealth(true);
-	// hook.InfiniteMagic(true);
-
-	// change actor model
-	// hook.setActorModel("kaineE");
-
-	// create a thread to exit when the 'END' button is pressed
-	// std::thread exitThread(ENDPressed, &hook);
-
-	while (hook.isHooked()) {
-		hook.update();
-		// print some values
-		// std::cout << "Magic " << hook.getMagic() << std::endl;
-		// std::cout << "Health " << hook.getHealth() << std::endl;
-		// std::cout << "Gold " << hook.getGold() << std::endl;
-		// std::cout << "Zone " << hook.getZone() << std::endl;
-		Sleep(500);
-		// system("cls");
-	}
-
-	// join thread and exit
-	// exitThread.join();
-
-	return 0;
-}
 
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
@@ -389,7 +316,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	{
 		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
-			kiero::bind(8, (void**)& oPresent, hkPresent);
+			kiero::bind(8, (void**)&oPresent, hkPresent);
 			main();
 			init_hook = true;
 		}
