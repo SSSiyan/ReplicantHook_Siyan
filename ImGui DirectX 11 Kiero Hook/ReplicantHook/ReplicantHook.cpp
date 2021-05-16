@@ -1,11 +1,14 @@
 #include "ReplicantHook.hpp"
-#include <vector>
 
-// dev
-uintptr_t ReplicantHook::_baseAddress(NULL);
-DWORD ReplicantHook::_pID(NULL);
-bool ReplicantHook::_hooked(NULL);
-uintptr_t ReplicantHook::actorPlayable(NULL);
+// toggle bools
+bool ReplicantHook::cursorForceHidden_toggle(false);
+bool ReplicantHook::forceModelsVisible_toggle(false);
+bool ReplicantHook::infiniteJumps_toggle(false);
+bool ReplicantHook::infiniteAirCombos_toggle(false);
+bool ReplicantHook::forceCharSelect_toggle(false);
+bool ReplicantHook::spoiler_toggle(false);
+bool ReplicantHook::takeNoDamage_toggle(false);
+bool ReplicantHook::dealNoDamage_toggle(false);
 
 // values
 int ReplicantHook::gold(NULL);
@@ -17,146 +20,15 @@ float ReplicantHook::magic(NULL);
 int ReplicantHook::level(NULL);
 double ReplicantHook::playtime(NULL);
 float ReplicantHook::xyzpos[3]{ 0.0f, 0.0f, 0.0f };
-
-// toggle bools
-bool ReplicantHook::cursorForceHidden_toggle(false);
-bool ReplicantHook::forceModelsVisible_toggle(false);
-bool ReplicantHook::infiniteJumps_toggle(false);
-bool ReplicantHook::infiniteAirCombos_toggle(false);
-bool ReplicantHook::forceCharSelect_toggle(false);
 int ReplicantHook::forceCharSelect_num(0);
-bool ReplicantHook::spoiler_toggle(false);
-bool ReplicantHook::takeNoDamage_toggle(false);
-bool ReplicantHook::dealNoDamage_toggle(false);
 
-DWORD ReplicantHook::_getProcessID(void)
-{
-	// search game window
-	HWND hwnd = FindWindowA(NULL, "NieR Replicant ver.1.22474487139...");
-	if (hwnd == NULL)
-	{
-		// return if game window not found
-		return 0;
-	}
-	DWORD pID;													  //Process ID
-	GetWindowThreadProcessId(hwnd, &pID);						  //Get Process ID
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pID); //Open process
-	if (pHandle == INVALID_HANDLE_VALUE)
-	{
-		// return if couldn't open the process
-		return 0;
-	}
-	return pID;
-}
+// dev values
+uintptr_t ReplicantHook::_baseAddress(NULL);
+DWORD ReplicantHook::_pID(NULL);
+bool ReplicantHook::_hooked(NULL);
+uintptr_t ReplicantHook::actorPlayable(NULL);
 
-uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName)
-{
-	uintptr_t modBaseAddr = 0;
-	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
-	if (hSnap != INVALID_HANDLE_VALUE)
-	{
-		MODULEENTRY32 modEntry;
-		modEntry.dwSize = sizeof(modEntry);
-		if (Module32First(hSnap, &modEntry))
-		{
-			do
-			{
-				if (!_stricmp(modEntry.szModule, modName))
-				{
-					modBaseAddr = (uintptr_t)modEntry.modBaseAddr;
-					break;
-				}
-			} while (Module32Next(hSnap, &modEntry));
-		}
-	}
-	CloseHandle(hSnap); // close handle to prevent memory leaks
-	return modBaseAddr;
-}
-
-// hook game
-void ReplicantHook::_hook(void)
-{
-	DWORD ID = ReplicantHook::_getProcessID();
-	if (ID <= 0)
-		return;
-	ReplicantHook::_pID = ID;
-	ReplicantHook::_baseAddress = ReplicantHook::_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
-	ReplicantHook::_hooked = true;
-}
-
-// unhook game
-void ReplicantHook::_unHook(void)
-{
-	ReplicantHook::_hooked = false;
-	ReplicantHook::_pID = 0;
-	ReplicantHook::_baseAddress = 0;
-	ReplicantHook::actorPlayable = 0;
-	ReplicantHook::gold = 0;
-	ReplicantHook::zone = "";
-	ReplicantHook::name = "";
-	ReplicantHook::health = 0;
-	ReplicantHook::magic = 0.0f;
-	ReplicantHook::level = 0;
-	ReplicantHook::playtime = 0.0;
-	ReplicantHook::InfiniteMagic(false);
-}
-
-void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
-{
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	DWORD oldprotection;
-	VirtualProtectEx(pHandle, destination, size, PAGE_EXECUTE_READWRITE, &oldprotection);
-	WriteProcessMemory(pHandle, destination, src, size, nullptr);
-	VirtualProtectEx(pHandle, destination, size, oldprotection, &oldprotection);
-	CloseHandle(pHandle);
-}
-
-template<typename T>
-inline T ReplicantHook::readMemory(uintptr_t address)
-{
-	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return value;
-}
-
-template<typename T>
-inline T ReplicantHook::readMemoryPointer(uintptr_t address)
-{
-	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return value;
-}
-
-template<typename T>
-inline void ReplicantHook::writeMemory(uintptr_t address, T value)
-{
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, NULL, ReplicantHook::_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle);
-}
-
-inline std::string ReplicantHook::readMemoryString(uintptr_t address)
-{
-	char val[20];
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return std::string(val);
-}
-
-inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
-{
-	SIZE_T BytesToWrite = value.length() + 1;
-	SIZE_T BytesWritten;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
-}
-
-
+// getters
 DWORD ReplicantHook::getProcessID(void)
 {
 	return ReplicantHook::_pID;
@@ -175,47 +47,6 @@ void ReplicantHook::start(void)
 void ReplicantHook::stop(void)
 {
 	ReplicantHook::_unHook();
-}
-
-void ReplicantHook::hookStatus(void)
-{
-	if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
-	{
-		ReplicantHook::_unHook();
-	}
-}
-
-// called on tick
-void ReplicantHook::update()
-{
-	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D8);
-	ReplicantHook::gold = readMemory<int>(0x437284C);
-	ReplicantHook::XP = readMemory<int>(0x4372800);
-	ReplicantHook::zone = readMemoryString(0x4372794);
-	ReplicantHook::name = readMemoryString(0x43727BC);
-	ReplicantHook::health = readMemory<int>(0x43727DC);
-	ReplicantHook::magic = readMemory<float>(0x43727E8);
-	ReplicantHook::level = readMemory<int>(0x43727F4);
-	ReplicantHook::playtime = readMemory<double>(0x4372C30);
-	//if (ReplicantHook::actorPlayable != 0)
-	//{
-		ReplicantHook::xyzpos[0] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
-		ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
-		ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
-	//}
-
-	// if char select is enabled, write the char
-	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
-	{
-		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-
-		// if character is 4, force old save stats
-		if (ReplicantHook::forceCharSelect_num == 4)
-		{
-			ReplicantHook::forceEndgameStats(true);
-		}
-	}
 }
 
 void ReplicantHook::forceEndgameStats(bool enabled)
@@ -282,6 +113,8 @@ float ReplicantHook::getZ()
 {
 	return ReplicantHook::xyzpos[2];
 }
+
+// setters
 
 void ReplicantHook::stealCursor(bool enabled)
 {
@@ -435,9 +268,173 @@ void ReplicantHook::forceCharSelect(int character)
 	ReplicantHook::writeMemory(0x43727B8, character);
 }
 
-constexpr unsigned int str2int(const char* str, int h = 0)
+// dev functions
+DWORD ReplicantHook::_getProcessID(void)
 {
-	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+	// search game window
+	HWND hwnd = FindWindowA(NULL, "NieR Replicant ver.1.22474487139...");
+	if (hwnd == NULL)
+	{
+		// return if game window not found
+		return 0;
+	}
+	DWORD pID;													  //Process ID
+	GetWindowThreadProcessId(hwnd, &pID);						  //Get Process ID
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pID); //Open process
+	if (pHandle == INVALID_HANDLE_VALUE)
+	{
+		// return if couldn't open the process
+		return 0;
+	}
+	return pID;
+}
+
+uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName)
+{
+	uintptr_t modBaseAddr = 0;
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
+	if (hSnap != INVALID_HANDLE_VALUE)
+	{
+		MODULEENTRY32 modEntry;
+		modEntry.dwSize = sizeof(modEntry);
+		if (Module32First(hSnap, &modEntry))
+		{
+			do
+			{
+				if (!_stricmp(modEntry.szModule, modName))
+				{
+					modBaseAddr = (uintptr_t)modEntry.modBaseAddr;
+					break;
+				}
+			} while (Module32Next(hSnap, &modEntry));
+		}
+	}
+	CloseHandle(hSnap); // close handle to prevent memory leaks
+	return modBaseAddr;
+}
+
+// hook game
+void ReplicantHook::_hook(void)
+{
+	DWORD ID = ReplicantHook::_getProcessID();
+	if (ID <= 0)
+		return;
+	ReplicantHook::_pID = ID;
+	ReplicantHook::_baseAddress = ReplicantHook::_getModuleBaseAddress(ID, "NieR Replicant ver.1.22474487139.exe");
+	ReplicantHook::_hooked = true;
+}
+
+// unhook game
+void ReplicantHook::_unHook(void)
+{
+	ReplicantHook::_hooked = false;
+	ReplicantHook::_pID = 0;
+	ReplicantHook::_baseAddress = 0;
+	ReplicantHook::actorPlayable = 0;
+	ReplicantHook::gold = 0;
+	ReplicantHook::zone = "";
+	ReplicantHook::name = "";
+	ReplicantHook::health = 0;
+	ReplicantHook::magic = 0.0f;
+	ReplicantHook::level = 0;
+	ReplicantHook::playtime = 0.0;
+	ReplicantHook::InfiniteMagic(false);
+}
+
+void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
+{
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	DWORD oldprotection;
+	VirtualProtectEx(pHandle, destination, size, PAGE_EXECUTE_READWRITE, &oldprotection);
+	WriteProcessMemory(pHandle, destination, src, size, nullptr);
+	VirtualProtectEx(pHandle, destination, size, oldprotection, &oldprotection);
+	CloseHandle(pHandle);
+}
+
+template<typename T>
+inline T ReplicantHook::readMemory(uintptr_t address)
+{
+	T value;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return value;
+}
+
+template<typename T>
+inline T ReplicantHook::readMemoryPointer(uintptr_t address)
+{
+	T value;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return value;
+}
+
+template<typename T>
+inline void ReplicantHook::writeMemory(uintptr_t address, T value)
+{
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, NULL, ReplicantHook::_pID);
+	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
+	CloseHandle(pHandle);
+}
+
+inline std::string ReplicantHook::readMemoryString(uintptr_t address)
+{
+	char val[20];
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
+	CloseHandle(pHandle); // close handle to prevent memory leaks
+	return std::string(val);
+}
+
+inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
+{
+	SIZE_T BytesToWrite = value.length() + 1;
+	SIZE_T BytesWritten;
+	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
+	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
+}
+
+void ReplicantHook::hookStatus(void)
+{
+	if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
+	{
+		ReplicantHook::_unHook();
+	}
+}
+
+// called on tick
+void ReplicantHook::update()
+{
+	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D8);
+	ReplicantHook::gold = readMemory<int>(0x437284C);
+	ReplicantHook::XP = readMemory<int>(0x4372800);
+	ReplicantHook::zone = readMemoryString(0x4372794);
+	ReplicantHook::name = readMemoryString(0x43727BC);
+	ReplicantHook::health = readMemory<int>(0x43727DC);
+	ReplicantHook::magic = readMemory<float>(0x43727E8);
+	ReplicantHook::level = readMemory<int>(0x43727F4);
+	ReplicantHook::playtime = readMemory<double>(0x4372C30);
+	//if (ReplicantHook::actorPlayable != 0)
+	//{
+	ReplicantHook::xyzpos[0] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
+	ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
+	ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
+	//}
+
+	// if char select is enabled, write the char
+	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
+	{
+		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+
+		// if character is 4, force old save stats
+		if (ReplicantHook::forceCharSelect_num == 4)
+		{
+			ReplicantHook::forceEndgameStats(true);
+		}
+	}
 }
 
 void ReplicantHook::onConfigLoad(const utils::Config& cfg) {

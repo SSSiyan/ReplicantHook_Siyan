@@ -1,8 +1,9 @@
-//#include "includes.h"
 #define DIRECTINPUT_VERSION 0x0800
-//#include <Windows.h>
-//#include <dxgi.h>
 #include <d3d11.h>
+#include <thread>
+#include <iostream>
+#include <array>
+#include <vector>
 #include "kiero/kiero.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
@@ -10,29 +11,20 @@
 #include <dinput.h>
 #include <shlobj_core.h>
 
-#include <thread>
-#include <iostream>
-#include <array>
-#include <vector>
 #include "ReplicantHook/ReplicantHook.hpp"
-#include "main2.hpp"
-
-static utils::Config cfg{ "replicant_hook.cfg" };
 
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef uintptr_t PTR;
-
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 Present oPresent;
 HWND window = NULL;
 WNDPROC oWndProc;
 ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
 ID3D11RenderTargetView* mainRenderTargetView;
-
 HMODULE g_dinput = 0;
+
 extern "C" {
 	__declspec(dllexport) HRESULT WINAPI direct_input8_create(HINSTANCE hinst, DWORD dw_version, const IID& riidltf, LPVOID* ppv_out, LPUNKNOWN punk_outer) {
 #pragma comment(linker, "/EXPORT:DirectInput8Create=direct_input8_create")
@@ -40,17 +32,9 @@ extern "C" {
 	}
 }
 
-void failed() {
-	ExitProcess(0);
-}
-
-LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
-	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
-
-	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
-}
+utils::Config cfg{ "replicant_hook.cfg" };
+static bool imguiInit = false;
+static bool imguiDraw = false;
 
 constexpr std::array<const char*, 5> characterNameStrings{
 	"Young Nier",		// 0
@@ -60,10 +44,7 @@ constexpr std::array<const char*, 5> characterNameStrings{
 	"Kaine"				// 4
 };
 
-bool imguiInit = false;
-bool imguiDraw = false;
-
-static void HelpMarker(const char* desc)
+void HelpMarker(const char* desc)
 {
 	ImGui::TextDisabled("(?)");
 	if (ImGui::IsItemHovered())
@@ -74,15 +55,6 @@ static void HelpMarker(const char* desc)
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
 	}
-}
-
-void InitImGui()
-{
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	// io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
-	ImGui_ImplWin32_Init(window);
-	ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
 void OpenedHook() // called when the user opens or closes imgui
@@ -98,6 +70,23 @@ void OpenedHook() // called when the user opens or closes imgui
 	{
 		ReplicantHook::stealCursor(0);
 	}
+}
+
+LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
+	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+}
+
+void InitImGui()
+{
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	// io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+	ImGui_ImplWin32_Init(window);
+	ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -135,6 +124,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 	}
 
+	// if display is toggled off, don't display imgui menu
 	if (!imguiDraw) {
 		goto imgui_finish;
 	}
@@ -307,20 +297,35 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	if (GetSystemDirectoryW(buffer, MAX_PATH) != 0) {
 		// Org dinput8.dll
 		if ((g_dinput = LoadLibraryW((std::wstring{ buffer } + L"\\dinput8.dll").c_str())) == NULL) {
-			failed();
+			ExitProcess(0);
 		}
 	}
-	Sleep(10000); // hook after game is loaded
+
+	// wait for game to load
+	Sleep(10000);
+
+	// look for memory leaks
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	// init dinput and hook
 	bool init_hook = false;
 	do
-	{
+	{	// if dinput init succeeds
 		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
 			kiero::bind(8, (void**)&oPresent, hkPresent);
-			main();
+			// hook
+			ReplicantHook::start();
 			init_hook = true;
 		}
 	} while (!init_hook);
+
+	// now hooked, load config and loop
+	ReplicantHook::onConfigLoad(cfg);
+	while (ReplicantHook::isHooked()) {
+		ReplicantHook::update();
+		Sleep(500);
+	}
 	return TRUE;
 }
 
