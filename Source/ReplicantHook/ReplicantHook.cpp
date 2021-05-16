@@ -280,26 +280,7 @@ DWORD ReplicantHook::_getProcessID(void)
 
 uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName)
 {
-	uintptr_t modBaseAddr = 0;
-	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
-	if (hSnap != INVALID_HANDLE_VALUE)
-	{
-		MODULEENTRY32 modEntry;
-		modEntry.dwSize = sizeof(modEntry);
-		if (Module32First(hSnap, &modEntry))
-		{
-			do
-			{
-				if (!_stricmp(modEntry.szModule, modName))
-				{
-					modBaseAddr = (uintptr_t)modEntry.modBaseAddr;
-					break;
-				}
-			} while (Module32Next(hSnap, &modEntry));
-		}
-	}
-	CloseHandle(hSnap); // close handle to prevent memory leaks
-	return modBaseAddr;
+	return (uintptr_t)GetModuleHandle(NULL);
 }
 
 void ReplicantHook::_hook(void)
