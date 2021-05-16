@@ -4,7 +4,7 @@
 #include <iostream>
 #include <array>
 #include <vector>
-#include "kiero/kiero.h"
+#include "ImGui DirectX 11 Kiero Hook/kiero.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -172,7 +172,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 			}
 			ImGui::SameLine();
-			HelpMarker("Disable the cursor display while using a gamepad. This can be toggled mid play with INSERT.");
+			HelpMarker("Disable the cursor display while using a gamepad. This can be toggled mid play with INSERT");
 
 			if (ImGui::Checkbox("Force 100% Model Visibility", &ReplicantHook::forceModelsVisible_toggle)) // toggle
 			{
