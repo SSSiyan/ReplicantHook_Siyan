@@ -39,16 +39,6 @@ uintptr_t ReplicantHook::getBaseAddress(void)
 	return ReplicantHook::_baseAddress;
 }
 
-void ReplicantHook::start(void)
-{
-	ReplicantHook::_hook();
-}
-
-void ReplicantHook::stop(void)
-{
-	ReplicantHook::_unHook();
-}
-
 void ReplicantHook::forceEndgameStats(bool enabled)
 {
 	ReplicantHook::writeMemory(0x4358CB0, enabled);
@@ -115,7 +105,6 @@ float ReplicantHook::getZ()
 }
 
 // setters
-
 void ReplicantHook::stealCursor(bool enabled)
 {
 	if (enabled)
@@ -313,7 +302,6 @@ uintptr_t ReplicantHook::_getModuleBaseAddress(DWORD procId, const char* modName
 	return modBaseAddr;
 }
 
-// hook game
 void ReplicantHook::_hook(void)
 {
 	DWORD ID = ReplicantHook::_getProcessID();
@@ -324,7 +312,6 @@ void ReplicantHook::_hook(void)
 	ReplicantHook::_hooked = true;
 }
 
-// unhook game
 void ReplicantHook::_unHook(void)
 {
 	ReplicantHook::_hooked = false;

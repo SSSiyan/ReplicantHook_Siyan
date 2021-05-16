@@ -45,7 +45,7 @@ public:
 	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 
 	// getters
-	static bool isHooked(void); // main.cpp startup check
+	static bool isHooked(); // main.cpp startup check
 	static int getGold();
 	static int getXP();
 	static std::string getZone();

@@ -57,13 +57,12 @@ void HelpMarker(const char* desc)
 	}
 }
 
-void OpenedHook() // called when the user opens or closes imgui
+void OpenedHook()
 {
 	// open imgui and steal cursor
 	imguiDraw = !imguiDraw;
 	if (imguiDraw)
 	{
-		// update() gets values every 500ms
 		ReplicantHook::stealCursor(1);
 	}
 	else
@@ -301,25 +300,21 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 		}
 	}
 
-	// wait for game to load
-	Sleep(10000);
-
 	// look for memory leaks
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	// init dinput and hook
 	bool init_hook = false;
 	do
-	{	// if dinput init succeeds
+	{
 		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
 			kiero::bind(8, (void**)&oPresent, hkPresent);
-			// hook
-			ReplicantHook::start();
 			init_hook = true;
 		}
 	} while (!init_hook);
 
+	ReplicantHook::_hook();
 	// now hooked, load config and loop
 	ReplicantHook::onConfigLoad(cfg);
 	while (ReplicantHook::isHooked()) {
