@@ -1,5 +1,5 @@
-# ImGui-DirectX-11-Kiero-Hook
-Universal ImGui implementation through DirectX 11 Hook (kiero)
+# ReplicantHook_Siyan
+<a href="https://github.com/Asiern/ReplicantHook">ReplicantHook</a> with added features and ImGui implementation through DirectX 11 Hook (kiero)
 <h1>Setting up the solution</h1>
 <ul>
   <li>Download and install <a href="https://www.microsoft.com/en-us/download/details.aspx?id=6812">DirectX SDK</a></li>
