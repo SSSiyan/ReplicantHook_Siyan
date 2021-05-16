@@ -416,19 +416,18 @@ void ReplicantHook::update()
 	ReplicantHook::magic = readMemory<float>(0x43727E8);
 	ReplicantHook::level = readMemory<int>(0x43727F4);
 	ReplicantHook::playtime = readMemory<double>(0x4372C30);
-	//if (ReplicantHook::actorPlayable != 0)
-	//{
+	// show 0 rather than junk values on boot
+	if (ReplicantHook::actorPlayable != 0)
+	{
 	ReplicantHook::xyzpos[0] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
 	ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
 	ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
-	//}
-
+	}
 	// if char select is enabled, write the char
 	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
 	{
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-
 		// if character is 4, force old save stats
 		if (ReplicantHook::forceCharSelect_num == 4)
 		{
