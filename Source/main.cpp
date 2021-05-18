@@ -174,7 +174,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::NewFrame();
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
 
-	ImGui::Begin("REPLICANT_HOOK_SIYAN_1.0", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("REPLICANT_HOOK_SIYAN_1.1", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	// check [SECTION] MAIN USER FACING STRUCTURES (ImGuiStyle, ImGuiIO) @ imgui.cpp
 
 	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
