@@ -29,16 +29,6 @@ bool ReplicantHook::_hooked(NULL);
 uintptr_t ReplicantHook::actorPlayable(NULL);
 
 // getters
-DWORD ReplicantHook::getProcessID(void)
-{
-	return ReplicantHook::_pID;
-}
-
-uintptr_t ReplicantHook::getBaseAddress(void)
-{
-	return ReplicantHook::_baseAddress;
-}
-
 void ReplicantHook::forceEndgameStats(bool enabled)
 {
 	ReplicantHook::writeMemory(0x4358CB0, enabled);

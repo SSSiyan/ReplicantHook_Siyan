@@ -16,6 +16,7 @@
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef uintptr_t PTR;
+typedef HRESULT(__stdcall* ResizeBuffers)(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 Present oPresent;
 HWND window = NULL;
@@ -24,6 +25,7 @@ ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
 ID3D11RenderTargetView* mainRenderTargetView;
 HMODULE g_dinput = 0;
+ResizeBuffers oResizeBuffers;
 
 extern "C" {
 	__declspec(dllexport) HRESULT WINAPI direct_input8_create(HINSTANCE hinst, DWORD dw_version, const IID& riidltf, LPVOID* ppv_out, LPUNKNOWN punk_outer) {
@@ -75,7 +77,7 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;
-
+	
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
@@ -86,6 +88,38 @@ void InitImGui()
 	// io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 	ImGui_ImplWin32_Init(window);
 	ImGui_ImplDX11_Init(pDevice, pContext);
+}
+
+HRESULT hkResizeBuffers(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+    if (mainRenderTargetView) {
+        pContext->OMSetRenderTargets(0, 0, 0);
+        mainRenderTargetView->Release();
+    }
+
+    HRESULT hr = oResizeBuffers(pThis, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+
+    ID3D11Texture2D* pBuffer;
+    pThis->GetBuffer(0, __uuidof(ID3D11Texture2D),
+        (void**)&pBuffer);
+    // Perform error handling here!
+
+    pDevice->CreateRenderTargetView(pBuffer, NULL,
+        &mainRenderTargetView);
+    // Perform error handling here!
+    pBuffer->Release();
+
+    pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+
+    // Set up the viewport.
+    D3D11_VIEWPORT vp;
+    vp.Width = Width;
+    vp.Height = Height;
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = 0;
+    vp.TopLeftY = 0;
+    pContext->RSSetViewports(1, &vp);
+    return hr;
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -110,6 +144,13 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
+
+	// ImGuiIO& io = ImGui::GetIO();
+	// if (io.DisplaySize.x > 0.0f && io.DisplaySize.y > 0.0f)
+	// {
+	// 	goto imgui_finish;
+	// 	// io.DisplaySize = ImVec2(0.0f, 0.0f);
+	// }
 
 	// open menu
 	if (GetAsyncKeyState(VK_DELETE) & 1) {
@@ -290,6 +331,70 @@ imgui_finish:
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
+// Pass 0 as the targetProcessId to suspend threads in the current process
+void DoSuspendThread(DWORD targetProcessId, DWORD targetThreadId)
+{
+	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		THREADENTRY32 te;
+		te.dwSize = sizeof(te);
+		if (Thread32First(h, &te))
+		{
+			do
+			{
+				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID))
+				{
+					// Suspend all threads EXCEPT the one we want to keep running
+					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId)
+					{
+						HANDLE thread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
+						if (thread != NULL)
+						{
+							SuspendThread(thread);
+							CloseHandle(thread);
+						}
+					}
+				}
+				te.dwSize = sizeof(te);
+			} while (Thread32Next(h, &te));
+		}
+		CloseHandle(h);
+	}
+}
+
+// Pass 0 as the targetProcessId to suspend threads in the current process
+void DoResumeThread(DWORD targetProcessId, DWORD targetThreadId)
+{
+	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		THREADENTRY32 te;
+		te.dwSize = sizeof(te);
+		if (Thread32First(h, &te))
+		{
+			do
+			{
+				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID))
+				{
+					// Suspend all threads EXCEPT the one we want to keep running
+					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId)
+					{
+						HANDLE thread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
+						if (thread != NULL)
+						{
+							ResumeThread(thread);
+							CloseHandle(thread);
+						}
+					}
+				}
+				te.dwSize = sizeof(te);
+			} while (Thread32Next(h, &te));
+		}
+		CloseHandle(h);
+	}
+}
+
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
 	wchar_t buffer[MAX_PATH]{ 0 };
@@ -303,6 +408,17 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	// look for memory leaks
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
+	// wait for game to load
+	Sleep(10000);
+
+	/*
+	DWORD pID = GetCurrentProcessId();
+	DWORD tID = GetCurrentThreadId();
+	DoSuspendThread(pID, tID);
+	MessageBox(window, "Attach", NULL, MB_OK | MB_SYSTEMMODAL);
+	DoResumeThread(pID, tID);
+	*/
+
 	// init dinput and hook
 	bool init_hook = false;
 	do
@@ -310,6 +426,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
 			kiero::bind(8, (void**)&oPresent, hkPresent);
+			kiero::bind(13, (void**)&oResizeBuffers, hkResizeBuffers);
 			init_hook = true;
 		}
 	} while (!init_hook);

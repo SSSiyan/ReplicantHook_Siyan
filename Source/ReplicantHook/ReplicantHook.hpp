@@ -38,11 +38,6 @@ public:
 	static DWORD _pID;
 	static uintptr_t _baseAddress;
 	static uintptr_t actorPlayable;
-	static DWORD _getProcessID(void);
-	static uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
-	static void _hook(void);
-	static void _unHook(void);
-	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 
 	// getters
 	static bool isHooked(); // main.cpp startup check
@@ -82,10 +77,11 @@ public:
 	static void forceEndgameStats(bool enabled);
 
 	// dev functions
-	static DWORD getProcessID(void);
-	static uintptr_t getBaseAddress(void);
-	static void start(void);
-	static void stop(void);
+	static DWORD _getProcessID(void);
+	static uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
+	static void _hook(void);
+	static void _unHook(void);
+	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 	static void hookStatus(void);
 	static void update();
 	template <typename T>
