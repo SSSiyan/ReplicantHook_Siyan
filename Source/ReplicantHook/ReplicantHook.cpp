@@ -349,14 +349,6 @@ inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string valu
 	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
 }
 
-void ReplicantHook::hookStatus(void)
-{
-	if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
-	{
-		ReplicantHook::_unHook();
-	}
-}
-
 // called on tick
 void ReplicantHook::update()
 {

@@ -177,12 +177,16 @@ HRESULT hkResizeBuffers(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UIN
     pContext->RSSetViewports(1, &vp);
     return hr;
 }
-/*
+
 void InitHook()
 {
-	
+	// get process ID and module base address
+	ReplicantHook::_hook();
+
+	// load settings, must happen after hook
+	ReplicantHook::onConfigLoad(cfg);
 }
-*/
+
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	if (!imguiInit)
@@ -200,37 +204,21 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			pBackBuffer->Release();
 			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 			InitImGui();
-			//InitHook();
+			InitHook();
 			imguiInit = true;
 		}
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	if (!ReplicantHook::_hooked)
+	// check process ID is valid
+	if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
 	{
-		// get process ID and module base address
-		ReplicantHook::_hook();
-		if (ReplicantHook::_hooked)
-		{
-			// load settings, must happen after hook
-			ReplicantHook::onConfigLoad(cfg);
-		}
-		else
-			goto imgui_finish;
+		goto imgui_finish;
 	}
-	else
-	{
-		// update imgui values
-		ReplicantHook::update();
 
-		// check process ID is valid
-		if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
-		{
-			//ReplicantHook::_unHook();
-			goto imgui_finish;
-		}
-	}
+	// update imgui values
+	ReplicantHook::update();
 
 	// open menu
 	if (GetAsyncKeyState(VK_DELETE) & 1) {

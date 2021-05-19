@@ -81,7 +81,6 @@ public:
 	static void _hook(void);
 	static void _unHook(void);
 	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
-	static void hookStatus(void);
 	static void update();
 	template <typename T>
 	static T readMemory(uintptr_t address);
