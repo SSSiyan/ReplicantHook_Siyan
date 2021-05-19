@@ -40,7 +40,6 @@ public:
 	static uintptr_t actorPlayable;
 
 	// getters
-	static bool isHooked(); // main.cpp startup check
 	static int getGold();
 	static int getXP();
 	static std::string getZone();

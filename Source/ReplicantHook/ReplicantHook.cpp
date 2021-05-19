@@ -25,18 +25,13 @@ int ReplicantHook::forceCharSelect_num(0);
 // dev values
 uintptr_t ReplicantHook::_baseAddress(NULL);
 DWORD ReplicantHook::_pID(NULL);
-bool ReplicantHook::_hooked(NULL);
+bool ReplicantHook::_hooked(false);
 uintptr_t ReplicantHook::actorPlayable(NULL);
 
 // getters
 void ReplicantHook::forceEndgameStats(bool enabled)
 {
 	ReplicantHook::writeMemory(0x4358CB0, enabled);
-}
-
-bool ReplicantHook::isHooked(void)
-{
-	return ReplicantHook::_hooked;
 }
 
 int ReplicantHook::getGold()
@@ -374,6 +369,7 @@ void ReplicantHook::update()
 	ReplicantHook::magic = readMemory<float>(0x43727E8);
 	ReplicantHook::level = readMemory<int>(0x43727F4);
 	ReplicantHook::playtime = readMemory<double>(0x4372C30);
+
 	// show 0 rather than junk values on boot
 	if (ReplicantHook::actorPlayable != 0)
 	{
@@ -381,11 +377,12 @@ void ReplicantHook::update()
 	ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
 	ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
 	}
+
 	// if char select is enabled, write the char
 	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle)
 	{
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
+
 		// if character is 4, force old save stats
 		if (ReplicantHook::forceCharSelect_num == 4)
 		{

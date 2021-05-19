@@ -85,7 +85,63 @@ void InitImGui()
 {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	// io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+	// font load examples
+	// io.Fonts->AddFontFromMemoryCompressedTTF(OpenSans_compressed_data, OpenSans_compressed_size, 15.0f);
+	// io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\impact.ttf", 15.0f);
+	io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+	ImGuiStyle& style = ImGui::GetStyle();
+	// 4hook styling
+	style.WindowRounding = 3.0f;
+	style.FrameRounding = 2.5f;
+	style.Colors[ImGuiCol_SliderGrab] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	style.Colors[ImGuiCol_Text] = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);
+	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.36f, 0.42f, 0.47f, 1.00f);
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.0026f, 0.0026f, 0.0026f, 0.90f);
+	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.18f, 0.22f, 1.00f);
+	style.Colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+	style.Colors[ImGuiCol_Border] = ImVec4(0.08f, 0.10f, 0.12f, 1.00f);
+	style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+	style.Colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.12f, 0.20f, 0.28f, 1.00f);
+	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.09f, 0.12f, 0.14f, 1.00f);
+	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.65f);
+	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.15f, 0.18f, 0.22f, 1.00f);
+	style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.39f);
+	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+	style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.18f, 0.22f, 0.25f, 1.00f);
+	style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.0078f, 0.53f, 0.8196f, 0.95f);
+	style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0078f, 0.53f, 0.8196f, 0.95f);
+	style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.0078f, 0.53f, 0.8196f, 0.95f);
+	style.Colors[ImGuiCol_Button] = ImVec4(0.0078f, 0.53f, 0.8196f, 0.95f);
+	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.0078f, 0.53f, 0.8196f, 0.95f);
+	style.Colors[ImGuiCol_Header] = ImVec4(0.20f, 0.25f, 0.29f, 0.55f);
+	style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+	style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+	style.Colors[ImGuiCol_Separator] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+	style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
+	style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
+	style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.25f);
+	style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+	style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+	style.Colors[ImGuiCol_Tab] = ImVec4(0.20f, 0.25f, 0.29f, 0.95f);
+	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+	style.Colors[ImGuiCol_TabActive] = ImVec4(0.0078f, 0.53f, 0.8196f, 0.95f);
+	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+	style.Colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+	style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+	style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+	style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+	style.Colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+	style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+	style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+	style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+	style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.4588f, 0.45880f, 0.4588f, 0.35f);
 	ImGui_ImplWin32_Init(window);
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
@@ -121,7 +177,12 @@ HRESULT hkResizeBuffers(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UIN
     pContext->RSSetViewports(1, &vp);
     return hr;
 }
-
+/*
+void InitHook()
+{
+	
+}
+*/
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	if (!imguiInit)
@@ -139,18 +200,37 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			pBackBuffer->Release();
 			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 			InitImGui();
+			//InitHook();
 			imguiInit = true;
 		}
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	// ImGuiIO& io = ImGui::GetIO();
-	// if (io.DisplaySize.x > 0.0f && io.DisplaySize.y > 0.0f)
-	// {
-	// 	goto imgui_finish;
-	// 	// io.DisplaySize = ImVec2(0.0f, 0.0f);
-	// }
+	if (!ReplicantHook::_hooked)
+	{
+		// get process ID and module base address
+		ReplicantHook::_hook();
+		if (ReplicantHook::_hooked)
+		{
+			// load settings, must happen after hook
+			ReplicantHook::onConfigLoad(cfg);
+		}
+		else
+			goto imgui_finish;
+	}
+	else
+	{
+		// update imgui values
+		ReplicantHook::update();
+
+		// check process ID is valid
+		if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
+		{
+			//ReplicantHook::_unHook();
+			goto imgui_finish;
+		}
+	}
 
 	// open menu
 	if (GetAsyncKeyState(VK_DELETE) & 1) {
@@ -409,17 +489,18 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	// wait for game to load
-	Sleep(10000);
+	// Sleep(10000);
 
-	/*
+#ifdef DEBUG
+	// give user time to attach for debug
 	DWORD pID = GetCurrentProcessId();
 	DWORD tID = GetCurrentThreadId();
 	DoSuspendThread(pID, tID);
 	MessageBox(window, "Attach", NULL, MB_OK | MB_SYSTEMMODAL);
 	DoResumeThread(pID, tID);
-	*/
+#endif
 
-	// init dinput and hook
+	// init imgui
 	bool init_hook = false;
 	do
 	{
@@ -431,13 +512,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 		}
 	} while (!init_hook);
 
-	ReplicantHook::_hook();
-	// now hooked, load config and loop
-	ReplicantHook::onConfigLoad(cfg);
-	while (ReplicantHook::isHooked()) {
-		ReplicantHook::update();
-		Sleep(500);
-	}
+	// kiero::shutdown();
 	return TRUE;
 }
 
