@@ -500,7 +500,6 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 		}
 	} while (!init_hook);
 
-	// kiero::shutdown();
 	return TRUE;
 }
 
