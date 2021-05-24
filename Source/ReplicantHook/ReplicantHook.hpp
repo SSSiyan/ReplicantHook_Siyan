@@ -29,8 +29,8 @@ public:
 	static float z;
 	static int gold;
 	static int XP;
-	static std::string zone;
-	static std::string name;
+	static const char* zone;
+	static const char* name;
 	static int forceCharSelect_num;
 	static float xyzpos[3];
 
@@ -83,12 +83,9 @@ public:
 	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
 	static void update();
 	template <typename T>
-	static T readMemory(uintptr_t address);
-	template <typename T>
 	static T readMemoryPointer(uintptr_t address);
 	template <typename T>
 	static void writeMemory(uintptr_t address, T value);
-	static std::string readMemoryString(uintptr_t address);
 	static void writeMemoryString(uintptr_t address, std::string value);
 	static void onConfigLoad(const utils::Config& cfg);
 	static void onConfigSave(utils::Config& cfg);

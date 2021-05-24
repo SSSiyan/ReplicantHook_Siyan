@@ -13,8 +13,8 @@ bool ReplicantHook::dealNoDamage_toggle(false);
 // values
 int ReplicantHook::gold(NULL);
 int ReplicantHook::XP(NULL);
-std::string ReplicantHook::zone;
-std::string ReplicantHook::name;
+const char* ReplicantHook::zone;
+const char* ReplicantHook::name;
 int ReplicantHook::health(NULL);
 float ReplicantHook::magic(NULL);
 int ReplicantHook::level(NULL);
@@ -305,16 +305,6 @@ void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
 }
 
 template<typename T>
-inline T ReplicantHook::readMemory(uintptr_t address)
-{
-	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return value;
-}
-
-template<typename T>
 inline T ReplicantHook::readMemoryPointer(uintptr_t address)
 {
 	T value;
@@ -332,24 +322,6 @@ inline void ReplicantHook::writeMemory(uintptr_t address, T value)
 	CloseHandle(pHandle);
 }
 
-inline std::string ReplicantHook::readMemoryString(uintptr_t address)
-{
-	char val[20];
-	for (int i = 0; i < 20; i++) {
-		val[i] = (*(char*)(address + i));
-	}
-	return std::string(val);
-}
-/*
-inline std::string ReplicantHook::readMemoryStringOLD(uintptr_t address)
-{
-	char val[20];
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return std::string(val);
-}
-*/
 inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
 {
 	SIZE_T BytesToWrite = value.length() + 1;
@@ -364,8 +336,8 @@ void ReplicantHook::update()
 	ReplicantHook::actorPlayable = (*(uintptr_t*)(ReplicantHook::_baseAddress + 0x26F72D8));
 	ReplicantHook::gold = (*(int*)(ReplicantHook::_baseAddress + 0x437284C));
 	ReplicantHook::XP = (*(int*)(ReplicantHook::_baseAddress + 0x4372800));
-	ReplicantHook::zone = ReplicantHook::readMemoryString(_baseAddress + 0x4372794);
-	ReplicantHook::name = ReplicantHook::readMemoryString(_baseAddress + 0x43727BC);
+	ReplicantHook::zone = (const char*)_baseAddress + 0x4372794;
+	ReplicantHook::name = (const char*)_baseAddress + 0x43727BC;
 	ReplicantHook::health = (*(int*)(ReplicantHook::_baseAddress + 0x43727DC));
 	ReplicantHook::magic = (*(float*)(ReplicantHook::_baseAddress + 0x43727E8));
 	ReplicantHook::level = (*(int*)(ReplicantHook::_baseAddress + 0x43727F4));
