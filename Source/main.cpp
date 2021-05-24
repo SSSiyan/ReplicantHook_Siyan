@@ -38,7 +38,7 @@ utils::Config cfg{ "replicant_hook.cfg" };
 static bool imguiInit = false;
 static bool imguiDraw = false;
 
-constexpr std::array<const char*, 5> characterNameStrings{
+constexpr std::array<const char*, 5> characterNameStrings {
 	"Young Nier",		// 0
 	"Prologue Nier",    // 1
 	"Old Nier",			// 2
@@ -46,11 +46,9 @@ constexpr std::array<const char*, 5> characterNameStrings{
 	"Kaine"				// 4
 };
 
-void HelpMarker(const char* desc)
-{
+void HelpMarker(const char* desc) {
 	ImGui::TextDisabled("(?)");
-	if (ImGui::IsItemHovered())
-	{
+	if (ImGui::IsItemHovered()) {
 		ImGui::BeginTooltip();
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 		ImGui::TextUnformatted(desc);
@@ -59,18 +57,12 @@ void HelpMarker(const char* desc)
 	}
 }
 
-void OpenedHook()
-{
-	// open imgui and steal cursor
+void OpenedHook() {
 	imguiDraw = !imguiDraw;
 	if (imguiDraw)
-	{
 		ReplicantHook::stealCursor(1);
-	}
 	else
-	{
 		ReplicantHook::stealCursor(0);
-	}
 }
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -81,8 +73,7 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-void InitImGui()
-{
+void InitImGui() {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	// font load examples
@@ -189,11 +180,8 @@ void InitHook()
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	if (!imguiInit)
-	{
-		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)& pDevice)))
-		{
-			
+	if (!imguiInit) {
+		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)& pDevice))) {
 			pDevice->GetImmediateContext(&pContext);
 			DXGI_SWAP_CHAIN_DESC sd;
 			pSwapChain->GetDesc(&sd);
@@ -210,28 +198,21 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
-
 	// check process ID is valid
-	if (ReplicantHook::_pID != ReplicantHook::_getProcessID())
-	{
+	if (ReplicantHook::_pID != ReplicantHook::_getProcessID()) {
 		goto imgui_finish;
 	}
-
 	// update imgui values
 	ReplicantHook::update();
-
 	// open menu
 	if (GetAsyncKeyState(VK_DELETE) & 1) {
 		OpenedHook();
 	}
-
 	// toggle gamepad cursor display
-	if (GetAsyncKeyState(VK_INSERT) & 1)
-	{
+	if (GetAsyncKeyState(VK_INSERT) & 1) {
 		ReplicantHook::cursorForceHidden_toggle =! ReplicantHook::cursorForceHidden_toggle;
 		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 	}
-
 	// if display is toggled off, don't display imgui menu
 	if (!imguiDraw) {
 		goto imgui_finish;
@@ -241,34 +222,28 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
+	ImGui::SetNextWindowSize(ImVec2(400, 500)), ImGuiCond_Always;
 
-	ImGui::Begin("REPLICANT_HOOK_SIYAN_1.1", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-	// check [SECTION] MAIN USER FACING STRUCTURES (ImGuiStyle, ImGuiIO) @ imgui.cpp
+	ImGui::Begin("REPLICANT_HOOK_SIYAN_1.2", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
 	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::SameLine(280);
-	if (ImGui::Button("Save config"))
-	{
+	if (ImGui::Button("Save config")) {
 		ReplicantHook::onConfigSave(cfg);
 	}
 
-	if (ImGui::BeginTabBar("Trainer", ImGuiTabBarFlags_FittingPolicyScroll))
-	{
-		if (ImGui::BeginTabItem("General"))
-		{
-			ImGui::Spacing(); 
+	if (ImGui::BeginTabBar("Trainer", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_NoTooltip)) {
+		if (ImGui::BeginTabItem("General")) {
 			ImGui::Text("System");
 			ImGui::Spacing();
 
-			if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden_toggle)) // toggle
-			{
+			if (ImGui::Checkbox("Disable cursor", &ReplicantHook::cursorForceHidden_toggle)) { // toggle 
 				ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 			}
 			ImGui::SameLine();
 			HelpMarker("Disable the cursor display while using a gamepad. This can be toggled mid play with INSERT");
 
-			if (ImGui::Checkbox("Force 100% Model Visibility", &ReplicantHook::forceModelsVisible_toggle)) // toggle
-			{
+			if (ImGui::Checkbox("Force 100% Model Visibility", &ReplicantHook::forceModelsVisible_toggle)) { // toggle
 				ReplicantHook::forceModelsVisible(ReplicantHook::forceModelsVisible_toggle);
 			}
 			ImGui::SameLine();
@@ -276,70 +251,62 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 			ImGui::Spacing();
 			ImGui::Separator();
-			ImGui::Spacing();
 			ImGui::Text("Cheats");
 			ImGui::Spacing();
 
 			ImGui::PushItemWidth(180);
-			if (ImGui::InputInt("Gold Amount", &ReplicantHook::gold, 1, 100))
-			{
+			if (ImGui::InputInt("Gold Amount", &ReplicantHook::gold, 1, 100)) {
 				ReplicantHook::setGold(ReplicantHook::gold);
 			}
 
-			if (ImGui::InputInt("Character XP", &ReplicantHook::XP, 1, 100))
-			{
+			if (ImGui::InputInt("Character XP", &ReplicantHook::XP, 1, 100)) {
 				ReplicantHook::setXP(ReplicantHook::XP);
 			}
 			ImGui::PopItemWidth();
 
-			if (ImGui::Checkbox("Take No Damage", &ReplicantHook::takeNoDamage_toggle)) // toggle
-			{
+			if (ImGui::Checkbox("Take No Damage", &ReplicantHook::takeNoDamage_toggle)) { // toggle
 				ReplicantHook::takeNoDamage(ReplicantHook::takeNoDamage_toggle);
 			}
 
 			ImGui::Spacing();
 			ImGui::Separator();
-			ImGui::Spacing();
 			ImGui::Text("Gameplay");
 			ImGui::Spacing();
 
 			// using SameLine(170) for buttons and (180) for dropdowns etc
-			if (ImGui::Checkbox("Deal No Damage", &ReplicantHook::dealNoDamage_toggle)) // toggle
-			{
+			if (ImGui::Checkbox("Deal No Damage", &ReplicantHook::dealNoDamage_toggle)) { // toggle
 				ReplicantHook::dealNoDamage(ReplicantHook::dealNoDamage_toggle);
 			}
 
-			if (ImGui::Checkbox("Infinite Air Combos and Dashes", &ReplicantHook::infiniteAirCombos_toggle)) // toggle
-			{
+			if (ImGui::Checkbox("Infinite Air Combos and Dashes", &ReplicantHook::infiniteAirCombos_toggle)) { // toggle
 				ReplicantHook::infiniteAirCombos(ReplicantHook::infiniteAirCombos_toggle);
 			}
 
-			if (ImGui::Checkbox("Infinite Jumps", &ReplicantHook::infiniteJumps_toggle)) // toggle
-			{
+			if (ImGui::Checkbox("Infinite Jumps", &ReplicantHook::infiniteJumps_toggle)) { // toggle
 				ReplicantHook::infiniteJumps(ReplicantHook::infiniteJumps_toggle);
 			}
 
 			ImGui::Spacing();
 			ImGui::Separator();
-			ImGui::Spacing();
 			ImGui::Text("Reference");
 			ImGui::Spacing();
 
-			ImGui::InputFloat3("Player Position", ReplicantHook::xyzpos);
+			ImGui::Text("Player Position:");
+			ImGui::InputFloat3("##Player Position", ReplicantHook::xyzpos);
+			ImGui::Spacing();
 			ImGui::Text("Current area: %s", ReplicantHook::zone);
 			ImGui::Text("Save name: %s", ReplicantHook::name);
+			/*if (ImGui::InputText("##ZoneInputFieldTest", (char*)ReplicantHook::zone, IM_ARRAYSIZE(ReplicantHook::zone))) {
+				ReplicantHook::setZone(ReplicantHook::zone);
+			}*/
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Spoilers"))
-		{
-			ImGui::Spacing();
+		if (ImGui::BeginTabItem("Spoilers")) {
 			ImGui::Checkbox("Spoiler Warning - do not tick this unless\nyou have finished every ending.", &ReplicantHook::spoiler_toggle);
-			if (ReplicantHook::spoiler_toggle)
-			{
+			if (ReplicantHook::spoiler_toggle) {
 				ImGui::Checkbox("Force Character Change", &ReplicantHook::forceCharSelect_toggle);
-				if (ReplicantHook::forceCharSelect_toggle)
-				{
+				if (ReplicantHook::forceCharSelect_toggle) {
 					ImGui::PushItemWidth(180);
 					ImGui::Combo("##CharSelectDropdown", &ReplicantHook::forceCharSelect_num, characterNameStrings.data(), characterNameStrings.size());
 					ImGui::PopItemWidth();
@@ -348,9 +315,23 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Credits"))
-		{
-			ImGui::Spacing();
+		if (ImGui::BeginTabItem("Warning")) {
+			ImGui::TextWrapped("WARNING: PLEASE BACK UP YOUR SAVEDATA BEFORE USING THIS HOOK.");
+			ImGui::TextWrapped("I haven't had any save corruption issues, but this is a long game and "
+				"I would hate for anyone to lose their saves because of me.");
+			ImGui::TextWrapped("By default your save is found here:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "My Games");
+			if (ImGui::IsItemClicked()) {
+				TCHAR saveGameLocation[MAX_PATH];
+				TCHAR myGames[MAX_PATH] = "My Games";
+				HRESULT result = SHGetFolderPathAndSubDirA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, myGames, saveGameLocation);
+				ShellExecuteA(NULL, "open", saveGameLocation, NULL, NULL, SW_SHOWNORMAL);
+			}
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Credits")) {
 			ImGui::Text("This hook is based off ReplicantHook by Asiern:\n");
 			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/Asiern/ReplicantHook");
 			if (ImGui::IsItemClicked()) {
@@ -368,39 +349,15 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 				ShellExecuteA(NULL, "open", "https://github.com/rdbo/ImGui-DirectX-11-Kiero-Hook", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::Separator();
-			ImGui::Text("Check out the ReplicantHook_Siyan source:\n");
+			ImGui::Text("Find updates for ReplicantHook_Siyan:\n");
 			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/SSSiyan/ReplicantHook_Siyan");
 			if (ImGui::IsItemClicked()) {
 				ShellExecuteA(NULL, "open", "https://github.com/SSSiyan/ReplicantHook_Siyan", NULL, NULL, SW_SHOWNORMAL);
 			}
-			ImGui::Text("And find updates here:\n");
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/SSSiyan/ReplicantHook_Siyan/releases");
-			if (ImGui::IsItemClicked()) {
-				ShellExecuteA(NULL, "open", "https://github.com/SSSiyan/ReplicantHook_Siyan/releases", NULL, NULL, SW_SHOWNORMAL);
-			}
 			ImGui::Spacing();
 			ImGui::Separator();
-			ImGui::Spacing();
-			ImGui::Text("Many thanks to anyone else who helped!");
+			ImGui::Text("Many thanks to anyone who helped!");
 			ImGui::Text("~Siyan");
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Warning"))
-		{
-			ImGui::Spacing();
-			ImGui::TextWrapped("WARNING: PLEASE BACK UP YOUR SAVEDATA BEFORE USING THIS HOOK.");
-			ImGui::TextWrapped("I haven't had any save corruption issues, but this is a long game and "
-				"I would hate for anyone to lose their saves because of me.");
-			ImGui::TextWrapped("By default your save is found here:");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "My Games");
-			if (ImGui::IsItemClicked()) {
-				TCHAR saveGameLocation[MAX_PATH];
-				TCHAR myGames[MAX_PATH] = "My Games";
-				HRESULT result = SHGetFolderPathAndSubDirA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, myGames, saveGameLocation);
-				ShellExecuteA(NULL, "open", saveGameLocation, NULL, NULL, SW_SHOWNORMAL);
-			}
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
@@ -415,25 +372,18 @@ imgui_finish:
 }
 
 // Pass 0 as the targetProcessId to suspend threads in the current process
-void DoSuspendThread(DWORD targetProcessId, DWORD targetThreadId)
-{
+void DoSuspendThread(DWORD targetProcessId, DWORD targetThreadId) {
 	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-	if (h != INVALID_HANDLE_VALUE)
-	{
+	if (h != INVALID_HANDLE_VALUE) {
 		THREADENTRY32 te;
 		te.dwSize = sizeof(te);
-		if (Thread32First(h, &te))
-		{
-			do
-			{
-				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID))
-				{
+		if (Thread32First(h, &te)) {
+			do {
+				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID)) {
 					// Suspend all threads EXCEPT the one we want to keep running
-					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId)
-					{
+					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId) {
 						HANDLE thread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
-						if (thread != NULL)
-						{
+						if (thread != NULL) {
 							SuspendThread(thread);
 							CloseHandle(thread);
 						}
@@ -447,25 +397,18 @@ void DoSuspendThread(DWORD targetProcessId, DWORD targetThreadId)
 }
 
 // Pass 0 as the targetProcessId to suspend threads in the current process
-void DoResumeThread(DWORD targetProcessId, DWORD targetThreadId)
-{
+void DoResumeThread(DWORD targetProcessId, DWORD targetThreadId) {
 	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-	if (h != INVALID_HANDLE_VALUE)
-	{
+	if (h != INVALID_HANDLE_VALUE) {
 		THREADENTRY32 te;
 		te.dwSize = sizeof(te);
-		if (Thread32First(h, &te))
-		{
-			do
-			{
-				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID))
-				{
+		if (Thread32First(h, &te)) {
+			do {
+				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID)) {
 					// Suspend all threads EXCEPT the one we want to keep running
-					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId)
-					{
+					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId) {
 						HANDLE thread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
-						if (thread != NULL)
-						{
+						if (thread != NULL) {
 							ResumeThread(thread);
 							CloseHandle(thread);
 						}
@@ -478,8 +421,7 @@ void DoResumeThread(DWORD targetProcessId, DWORD targetThreadId)
 	}
 }
 
-DWORD WINAPI MainThread(LPVOID lpReserved)
-{
+DWORD WINAPI MainThread(LPVOID lpReserved) {
 	wchar_t buffer[MAX_PATH]{ 0 };
 	if (GetSystemDirectoryW(buffer, MAX_PATH) != 0) {
 		// Org dinput8.dll
@@ -505,10 +447,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 
 	// init imgui
 	bool init_hook = false;
-	do
-	{
-		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
-		{
+	do {
+		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success) {
 			kiero::bind(8, (void**)&oPresent, hkPresent);
 			kiero::bind(13, (void**)&oResizeBuffers, hkResizeBuffers);
 			init_hook = true;
@@ -518,10 +458,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	return TRUE;
 }
 
-BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
-{
-	switch (dwReason)
-	{
+BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
+	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hMod);
 		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
