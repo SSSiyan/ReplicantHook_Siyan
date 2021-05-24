@@ -335,12 +335,21 @@ inline void ReplicantHook::writeMemory(uintptr_t address, T value)
 inline std::string ReplicantHook::readMemoryString(uintptr_t address)
 {
 	char val[20];
+	for (int i = 0; i < 20; i++) {
+		val[i] = (*(char*)(address + i));
+	}
+	return std::string(val);
+}
+/*
+inline std::string ReplicantHook::readMemoryStringOLD(uintptr_t address)
+{
+	char val[20];
 	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
 	ReadProcessMemory(pHandle, (LPCVOID)(ReplicantHook::_baseAddress + address), &val, sizeof(val), NULL);
 	CloseHandle(pHandle); // close handle to prevent memory leaks
 	return std::string(val);
 }
-
+*/
 inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
 {
 	SIZE_T BytesToWrite = value.length() + 1;
@@ -352,22 +361,24 @@ inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string valu
 // called on tick
 void ReplicantHook::update()
 {
-	ReplicantHook::actorPlayable = readMemory <uintptr_t>(0x26F72D8);
-	ReplicantHook::gold = readMemory<int>(0x437284C);
-	ReplicantHook::XP = readMemory<int>(0x4372800);
-	ReplicantHook::zone = readMemoryString(0x4372794);
-	ReplicantHook::name = readMemoryString(0x43727BC);
-	ReplicantHook::health = readMemory<int>(0x43727DC);
-	ReplicantHook::magic = readMemory<float>(0x43727E8);
-	ReplicantHook::level = readMemory<int>(0x43727F4);
-	ReplicantHook::playtime = readMemory<double>(0x4372C30);
+	ReplicantHook::actorPlayable = (*(uintptr_t*)(ReplicantHook::_baseAddress + 0x26F72D8));
+	ReplicantHook::gold = (*(int*)(ReplicantHook::_baseAddress + 0x437284C));
+	ReplicantHook::XP = (*(int*)(ReplicantHook::_baseAddress + 0x4372800));
+	ReplicantHook::zone = ReplicantHook::readMemoryString(_baseAddress + 0x4372794);
+	ReplicantHook::name = ReplicantHook::readMemoryString(_baseAddress + 0x43727BC);
+	ReplicantHook::health = (*(int*)(ReplicantHook::_baseAddress + 0x43727DC));
+	ReplicantHook::magic = (*(float*)(ReplicantHook::_baseAddress + 0x43727E8));
+	ReplicantHook::level = (*(int*)(ReplicantHook::_baseAddress + 0x43727F4));
+	ReplicantHook::playtime = (*(double*)(ReplicantHook::_baseAddress + 0x4372C30));
+	//const char stringTest1[20] = "1234567890123456789";
+	//std::string stringTest = (std::string)stringTest1;
 
 	// show 0 rather than junk values on boot
 	if (ReplicantHook::actorPlayable != 0)
 	{
-	ReplicantHook::xyzpos[0] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0x9C);
-	ReplicantHook::xyzpos[1] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xAC);
-	ReplicantHook::xyzpos[2] = readMemoryPointer<float>((uintptr_t)ReplicantHook::actorPlayable + 0xBC);
+	ReplicantHook::xyzpos[0] = (*(float*)(ReplicantHook::actorPlayable + 0x9C));
+	ReplicantHook::xyzpos[1] = (*(float*)(ReplicantHook::actorPlayable + 0xAC));
+	ReplicantHook::xyzpos[2] = (*(float*)(ReplicantHook::actorPlayable + 0xBC));
 	}
 
 	// if char select is enabled, write the char

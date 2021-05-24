@@ -364,6 +364,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		if (ImGui::BeginTabItem("Credits"))
 
 		{
+			ImGui::Text(&ReplicantHook::zone[0]);
+			ImGui::Text(&ReplicantHook::name[0]);
 			ImGui::Spacing();
 			ImGui::Text("This hook is based off ReplicantHook by Asiern:\n");
 			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "https://github.com/Asiern/ReplicantHook");
