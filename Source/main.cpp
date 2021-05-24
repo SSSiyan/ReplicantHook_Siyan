@@ -246,7 +246,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	// check [SECTION] MAIN USER FACING STRUCTURES (ImGuiStyle, ImGuiIO) @ imgui.cpp
 
 	ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::SameLine(300);
+	ImGui::SameLine(280);
 	if (ImGui::Button("Save config"))
 	{
 		ReplicantHook::onConfigSave(cfg);
@@ -256,21 +256,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	{
 		if (ImGui::BeginTabItem("General"))
 		{
-			ImGui::Spacing();
-			ImGui::TextWrapped("WARNING: PLEASE BACK UP YOUR SAVEDATA BEFORE USING THIS HOOK.");
-			ImGui::TextWrapped("I haven't had any save corruption issues, but this is a long game and "
-				"I would hate for anyone to lose their saves because of me.");
-			ImGui::TextWrapped("By default your save is found here:");
-			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "My Games");
-			if (ImGui::IsItemClicked()) {
-				TCHAR saveGameLocation[MAX_PATH];
-				TCHAR myGames[MAX_PATH] = "My Games";
-				HRESULT result = SHGetFolderPathAndSubDirA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, myGames, saveGameLocation);
-				ShellExecuteA(NULL, "open", saveGameLocation, NULL, NULL, SW_SHOWNORMAL);
-			}
-			ImGui::Spacing();
-			ImGui::Separator();
 			ImGui::Spacing(); 
 			ImGui::Text("System");
 			ImGui::Spacing();
@@ -341,9 +326,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			ImGui::Spacing();
 
 			ImGui::InputFloat3("Player Position", ReplicantHook::xyzpos);
-
+			ImGui::Text("Current area: %s", ReplicantHook::zone);
+			ImGui::Text("Save name: %s", ReplicantHook::name);
 			ImGui::EndTabItem();
 		}
+
 		if (ImGui::BeginTabItem("Spoilers"))
 		{
 			ImGui::Spacing();
@@ -362,32 +349,58 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		}
 
 		if (ImGui::BeginTabItem("Credits"))
-
 		{
-			ImGui::Text(ReplicantHook::zone);
-			ImGui::Text(ReplicantHook::name);
 			ImGui::Spacing();
 			ImGui::Text("This hook is based off ReplicantHook by Asiern:\n");
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "https://github.com/Asiern/ReplicantHook");
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/Asiern/ReplicantHook");
 			if (ImGui::IsItemClicked()) {
 				ShellExecuteA(NULL, "open", "https://github.com/Asiern/ReplicantHook", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::Separator();
 			ImGui::Text("The GUI is Dear ImGui by Ocornut:\n");
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "https://github.com/ocornut/imgui");
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/ocornut/imgui");
 			if (ImGui::IsItemClicked()) {
 				ShellExecuteA(NULL, "open", "https://github.com/ocornut/imgui", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::Text("Which was built using Kiero by rdbo:\n");
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "https://github.com/rdbo/ImGui-DirectX-11-Kiero-Hook");
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/rdbo/ImGui-DirectX-11-Kiero-Hook");
 			if (ImGui::IsItemClicked()) {
 				ShellExecuteA(NULL, "open", "https://github.com/rdbo/ImGui-DirectX-11-Kiero-Hook", NULL, NULL, SW_SHOWNORMAL);
+			}
+			ImGui::Separator();
+			ImGui::Text("Check out the ReplicantHook_Siyan source:\n");
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/SSSiyan/ReplicantHook_Siyan");
+			if (ImGui::IsItemClicked()) {
+				ShellExecuteA(NULL, "open", "https://github.com/SSSiyan/ReplicantHook_Siyan", NULL, NULL, SW_SHOWNORMAL);
+			}
+			ImGui::Text("And find updates here:\n");
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/SSSiyan/ReplicantHook_Siyan/releases");
+			if (ImGui::IsItemClicked()) {
+				ShellExecuteA(NULL, "open", "https://github.com/SSSiyan/ReplicantHook_Siyan/releases", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
 			ImGui::Text("Many thanks to anyone else who helped!");
 			ImGui::Text("~Siyan");
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Warning"))
+		{
+			ImGui::Spacing();
+			ImGui::TextWrapped("WARNING: PLEASE BACK UP YOUR SAVEDATA BEFORE USING THIS HOOK.");
+			ImGui::TextWrapped("I haven't had any save corruption issues, but this is a long game and "
+				"I would hate for anyone to lose their saves because of me.");
+			ImGui::TextWrapped("By default your save is found here:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "My Games");
+			if (ImGui::IsItemClicked()) {
+				TCHAR saveGameLocation[MAX_PATH];
+				TCHAR myGames[MAX_PATH] = "My Games";
+				HRESULT result = SHGetFolderPathAndSubDirA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, myGames, saveGameLocation);
+				ShellExecuteA(NULL, "open", saveGameLocation, NULL, NULL, SW_SHOWNORMAL);
+			}
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
