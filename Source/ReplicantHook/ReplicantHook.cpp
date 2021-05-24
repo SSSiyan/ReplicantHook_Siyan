@@ -28,94 +28,18 @@ DWORD ReplicantHook::_pID(NULL);
 bool ReplicantHook::_hooked(false);
 uintptr_t ReplicantHook::actorPlayable(NULL);
 
-// getters
-void ReplicantHook::forceEndgameStats(bool enabled)
-{
-	ReplicantHook::writeMemory(0x4358CB0, enabled);
-}
-
-int ReplicantHook::getGold()
-{
-	return ReplicantHook::gold;
-}
-
-int ReplicantHook::getXP()
-{
-	return ReplicantHook::XP;
-}
-
-std::string ReplicantHook::getZone()
-{
-	return ReplicantHook::zone;
-}
-
-std::string ReplicantHook::getName()
-{
-	return ReplicantHook::name;
-}
-
-int ReplicantHook::getHealth()
-{
-	return ReplicantHook::health;
-}
-
-float ReplicantHook::getMagic()
-{
-	return ReplicantHook::magic;
-}
-
-int ReplicantHook::getLevel()
-{
-	return ReplicantHook::level;
-}
-
-double ReplicantHook::getPlaytime()
-{
-	return ReplicantHook::playtime;
-}
-
-float ReplicantHook::getX()
-{
-	return ReplicantHook::xyzpos[0];
-}
-
-float ReplicantHook::getY()
-{
-	return ReplicantHook::xyzpos[1];
-}
-
-float ReplicantHook::getZ()
-{
-	return ReplicantHook::xyzpos[2];
-}
-
-// setters
-void ReplicantHook::stealCursor(bool enabled)
-{
-	if (enabled)
-	{
-		ReplicantHook::writeMemory(0x443C1FF, true);  // show cursor
-		ReplicantHook::writeMemory(0x443C1FE, false); // disable game input
-		
-	}
-	else
-	{
-		ReplicantHook::writeMemory(0x443C1FF, false); // hide cursor
-		ReplicantHook::writeMemory(0x443C1FE, true);  // enable game input
-	}
-}
-
+// patches
 void ReplicantHook::cursorForceHidden(bool enabled) // disables the game displaying the cursor when using a gamepad
 {
 	if (enabled)
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D3499), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
-		ReplicantHook::writeMemory(0x443C1FF, false); // hide cursor
+		ReplicantHook::_nop((char*)(ReplicantHook::_baseAddress + 0x3D3499), 7);
+		(*(bool*)(ReplicantHook::_baseAddress + 0x443C1FF)) = false; // hide cursor
 	}
 	else
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3D3499), (BYTE*)"\x40\x88\xB3\x8F\x00\x00\x00", 7);
-		ReplicantHook::writeMemory(0x443C1FF, true);  // show cursor
+		ReplicantHook::_patch((char*)(ReplicantHook::_baseAddress + 0x3D3499), (char*)"\x40\x88\xB3\x8F\x00\x00\x00", 7);
+		(*(bool*)(ReplicantHook::_baseAddress + 0x443C1FF)) = true; // show cursor
 	}
 }
 
@@ -123,12 +47,12 @@ void ReplicantHook::forceModelsVisible(bool enabled)
 {
 	if (enabled)
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x15676A), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90\x90", 8);
+		ReplicantHook::_nop((char*)(ReplicantHook::_baseAddress + 0x15676A), 8);
 
 	}
 	else
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x15676A), (BYTE*)"\xF3\x0F\x10\x8B\x80\x15\x00\x00", 8);
+		ReplicantHook::_patch((char*)(ReplicantHook::_baseAddress + 0x15676A), (char*)"\xF3\x0F\x10\x8B\x80\x15\x00\x00", 8);
 	}
 }
 
@@ -136,12 +60,12 @@ void ReplicantHook::infiniteJumps(bool enabled)
 {
 	if (enabled)
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x69EB8A), (BYTE*)"\x90\x90", 2);
+		ReplicantHook::_nop((char*)(ReplicantHook::_baseAddress + 0x69EB8A), 2);
 
 	}
 	else
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x69EB8A), (BYTE*)"\x84\xC0", 2);
+		ReplicantHook::_patch((char*)(ReplicantHook::_baseAddress + 0x69EB8A), (char*)"\x84\xC0", 2);
 	}
 }
 
@@ -149,97 +73,118 @@ void ReplicantHook::infiniteAirCombos(bool enabled)
 {
 	if (enabled)
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x6C13E8), (BYTE*)"\x90\x90\x90\x90\x90\x90\x90", 7);
+		ReplicantHook::_nop((char*)(ReplicantHook::_baseAddress + 0x6C13E8), 7);
 
 	}
 	else
 	{
-		ReplicantHook::_patch((BYTE*)(ReplicantHook::_baseAddress + 0x6C13E8), (BYTE*)"\xFF\x84\x81\x2C\x61\x01\x00", 7);
+		ReplicantHook::_patch((char*)(ReplicantHook::_baseAddress + 0x6C13E8), (char*)"\xFF\x84\x81\x2C\x61\x01\x00", 7);
 	}
-}
-
-void ReplicantHook::setGold(int value)
-{
-	ReplicantHook::writeMemory(0x437284C, value);
-}
-
-void ReplicantHook::setXP(int value)
-{
-	ReplicantHook::writeMemory(0x4372800, value);
-}
-
-void ReplicantHook::setZone(std::string value)
-{
-	ReplicantHook::writeMemoryString(0x4372794, value);
-}
-
-void ReplicantHook::setName(std::string value)
-{
-	ReplicantHook::writeMemoryString(0x43727BC, value);
-}
-
-void ReplicantHook::setHealth(int value)
-{
-	ReplicantHook::writeMemory(0x43727DC, value);
-}
-
-void ReplicantHook::setMagic(float value)
-{
-	ReplicantHook::writeMemory(0x43727E8, value);
-}
-
-void ReplicantHook::setLevel(int value)
-{
-	ReplicantHook::writeMemory(0x43727F4, value);
-}
-
-void ReplicantHook::setPlaytime(double value)
-{
-	ReplicantHook::writeMemory(0x4372C30, value);
-}
-
-void ReplicantHook::setX(float value)
-{
-	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0x9C, value);
-}
-
-void ReplicantHook::setY(float value)
-{
-	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0xAC, value);
-}
-
-void ReplicantHook::setZ(float value)
-{
-	ReplicantHook::writeMemory(ReplicantHook::actorPlayable + 0xBC, value);
 }
 
 void ReplicantHook::takeNoDamage(bool enabled)
 {
 	if (enabled)
-		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x5D106DD), (BYTE*)"\x90\x90\x90\x90\x90", 5);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x5D106DD), (char*)"\x90\x90\x90\x90\x90", 5);
 	else
-		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x5D106DD), (BYTE*)"\x44\x89\x44\x81\x4C", 5);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x5D106DD), (char*)"\x44\x89\x44\x81\x4C", 5);
 }
 
 void ReplicantHook::InfiniteMagic(bool enabled)
 {
 	if (enabled)
-		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3BDB5E), (BYTE*)"\x90\x90\x90\x90\x90\x90", 6);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x3BDB5E), (char*)"\x90\x90\x90\x90\x90\x90", 6);
 	else
-		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x3BDB5E), (BYTE*)"\xF3\x0F\x11\x54\x81\x58", 6);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x3BDB5E), (char*)"\xF3\x0F\x11\x54\x81\x58", 6);
 }
 
 void ReplicantHook::dealNoDamage(bool enabled)
 {
 	if (enabled)
-		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x2A5CBE), (BYTE*)"\x90\x90\x90\x90\x90\x90", 6);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x2A5CBE), (char*)"\x90\x90\x90\x90\x90\x90", 6);
 	else
-		_patch((BYTE*)(ReplicantHook::_baseAddress + 0x2A5CBE), (BYTE*)"\x89\xBB\xEC\x02\x00\x00", 6);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x2A5CBE), (char*)"\x89\xBB\xEC\x02\x00\x00", 6);
+}
+
+// setters
+void ReplicantHook::stealCursor(bool enabled)
+{
+	if (enabled)
+	{
+		(*(bool*)(ReplicantHook::_baseAddress + 0x443C1FF)) = true; // show cursor
+		(*(bool*)(ReplicantHook::_baseAddress + 0x443C1FE)) = false; // disable game input
+
+	}
+	else
+	{
+		(*(bool*)(ReplicantHook::_baseAddress + 0x443C1FF)) = false; // hide cursor
+		(*(bool*)(ReplicantHook::_baseAddress + 0x443C1FE)) = true;  // enable game input
+	}
+}
+
+void ReplicantHook::forceEndgameStats(bool enabled)
+{
+	(*(bool*)(ReplicantHook::_baseAddress + 0x4358CB0)) = true;
+}
+
+void ReplicantHook::setGold(int value)
+{
+	(*(int*)(ReplicantHook::_baseAddress + 0x437284C)) = value;
+}
+
+void ReplicantHook::setXP(int value)
+{
+	(*(int*)(ReplicantHook::_baseAddress + 0x4372800)) = value;
+}
+
+void ReplicantHook::setZone(std::string value)
+{
+	(*(std::string*)(ReplicantHook::_baseAddress + 0x4372794)) = value;
+}
+
+void ReplicantHook::setName(std::string value)
+{
+	(*(std::string*)(ReplicantHook::_baseAddress + 0x43727BC)) = value;
+}
+
+void ReplicantHook::setHealth(int value)
+{
+	(*(int*)(ReplicantHook::_baseAddress + 0x43727DC)) = value;
+}
+
+void ReplicantHook::setMagic(float value)
+{
+	(*(float*)(ReplicantHook::_baseAddress + 0x43727E8)) = value;
+}
+
+void ReplicantHook::setLevel(int value)
+{
+	(*(int*)(ReplicantHook::_baseAddress + 0x43727F4)) = value;
+}
+
+void ReplicantHook::setPlaytime(double value)
+{
+	(*(double*)(ReplicantHook::_baseAddress + 0x4372C30)) = value;
+}
+
+void ReplicantHook::setX(float value)
+{
+	(*(float*)(ReplicantHook::actorPlayable + 0x9C)) = value;
+}
+
+void ReplicantHook::setY(float value)
+{
+	(*(float*)(ReplicantHook::actorPlayable + 0xAC)) = value;
+}
+
+void ReplicantHook::setZ(float value)
+{
+	(*(float*)(ReplicantHook::actorPlayable + 0xBC)) = value;
 }
 
 void ReplicantHook::forceCharSelect(int character)
 {
-	ReplicantHook::writeMemory(0x43727B8, character);
+	(*(int*)(ReplicantHook::_baseAddress + 0x43727B8)) = character;
 }
 
 // dev functions
@@ -278,56 +223,20 @@ void ReplicantHook::_hook(void)
 	ReplicantHook::_hooked = true;
 }
 
-void ReplicantHook::_unHook(void)
+void ReplicantHook::_patch(char* dst, char* src, int size)
 {
-	ReplicantHook::_hooked = false;
-	ReplicantHook::_pID = 0;
-	ReplicantHook::_baseAddress = 0;
-	ReplicantHook::actorPlayable = 0;
-	ReplicantHook::gold = 0;
-	ReplicantHook::zone = "";
-	ReplicantHook::name = "";
-	ReplicantHook::health = 0;
-	ReplicantHook::magic = 0.0f;
-	ReplicantHook::level = 0;
-	ReplicantHook::playtime = 0.0;
-	ReplicantHook::InfiniteMagic(false);
+	DWORD oldprotect;
+	VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+	memcpy(dst, src, size);
+	VirtualProtect(dst, size, oldprotect, &oldprotect);
 }
 
-void ReplicantHook::_patch(BYTE* destination, BYTE* src, unsigned int size)
+void ReplicantHook::_nop(char* dst, unsigned int size)
 {
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	DWORD oldprotection;
-	VirtualProtectEx(pHandle, destination, size, PAGE_EXECUTE_READWRITE, &oldprotection);
-	WriteProcessMemory(pHandle, destination, src, size, nullptr);
-	VirtualProtectEx(pHandle, destination, size, oldprotection, &oldprotection);
-	CloseHandle(pHandle);
-}
-
-template<typename T>
-inline T ReplicantHook::readMemoryPointer(uintptr_t address)
-{
-	T value;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	ReadProcessMemory(pHandle, (LPCVOID)(address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle); // close handle to prevent memory leaks
-	return value;
-}
-
-template<typename T>
-inline void ReplicantHook::writeMemory(uintptr_t address, T value)
-{
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, NULL, ReplicantHook::_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), &value, sizeof(value), NULL);
-	CloseHandle(pHandle);
-}
-
-inline void ReplicantHook::writeMemoryString(uintptr_t address, std::string value)
-{
-	SIZE_T BytesToWrite = value.length() + 1;
-	SIZE_T BytesWritten;
-	HANDLE pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ReplicantHook::_pID);
-	WriteProcessMemory(pHandle, (LPVOID)(ReplicantHook::_baseAddress + address), (LPCVOID)value.c_str(), BytesToWrite, &BytesWritten);
+	DWORD oldprotect;
+	VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+	memset(dst, 0x90, size);
+	VirtualProtect(dst, size, oldprotect, &oldprotect);
 }
 
 // called on tick
@@ -342,8 +251,6 @@ void ReplicantHook::update()
 	ReplicantHook::magic = (*(float*)(ReplicantHook::_baseAddress + 0x43727E8));
 	ReplicantHook::level = (*(int*)(ReplicantHook::_baseAddress + 0x43727F4));
 	ReplicantHook::playtime = (*(double*)(ReplicantHook::_baseAddress + 0x4372C30));
-	//const char stringTest1[20] = "1234567890123456789";
-	//std::string stringTest = (std::string)stringTest1;
 
 	// show 0 rather than junk values on boot
 	if (ReplicantHook::actorPlayable != 0)

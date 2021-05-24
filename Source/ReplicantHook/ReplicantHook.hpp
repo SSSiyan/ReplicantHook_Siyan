@@ -39,19 +39,6 @@ public:
 	static uintptr_t _baseAddress;
 	static uintptr_t actorPlayable;
 
-	// getters
-	static int getGold();
-	static int getXP();
-	static std::string getZone();
-	static std::string getName();
-	static int getHealth();
-	static float getMagic();
-	static int getLevel();
-	static double getPlaytime();
-	static float getX();
-	static float getY();
-	static float getZ();
-
 	// setters
 	static void stealCursor(bool enabled);
 	static void cursorForceHidden(bool enabled);
@@ -79,14 +66,9 @@ public:
 	static DWORD _getProcessID(void);
 	static uintptr_t _getModuleBaseAddress(DWORD procId, const char* modName);
 	static void _hook(void);
-	static void _unHook(void);
-	static void _patch(BYTE* destination, BYTE* src, unsigned int size);
+	static void _patch(char* dst, char* src, int size);
+	static void _nop(char* dst, unsigned int size);
 	static void update();
-	template <typename T>
-	static T readMemoryPointer(uintptr_t address);
-	template <typename T>
-	static void writeMemory(uintptr_t address, T value);
-	static void writeMemoryString(uintptr_t address, std::string value);
 	static void onConfigLoad(const utils::Config& cfg);
 	static void onConfigSave(utils::Config& cfg);
 private:
