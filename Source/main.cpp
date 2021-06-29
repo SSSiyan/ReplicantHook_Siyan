@@ -60,9 +60,9 @@ void HelpMarker(const char* desc) {
 void OpenedHook() {
 	imguiDraw = !imguiDraw;
 	if (imguiDraw)
-		ReplicantHook::stealCursor(1);
+		ReplicantHook::stealCursor(true);
 	else
-		ReplicantHook::stealCursor(0);
+		ReplicantHook::stealCursor(false);
 }
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -150,8 +150,8 @@ HRESULT hkResizeBuffers(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UIN
         (void**)&pBuffer);
     // Perform error handling here!
 
-    pDevice->CreateRenderTargetView(pBuffer, NULL,
-        &mainRenderTargetView);
+    pDevice->CreateRenderTargetView(pBuffer, NULL, &mainRenderTargetView);
+
     // Perform error handling here!
     pBuffer->Release();
 
@@ -429,13 +429,10 @@ DWORD WINAPI MainThread(LPVOID lpReserved) {
 			ExitProcess(0);
 		}
 	}
-
 	// look for memory leaks
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
 	// wait for game to load
 	// Sleep(10000);
-
 #ifdef DEBUG
 	// give user time to attach for debug
 	DWORD pID = GetCurrentProcessId();
@@ -444,7 +441,6 @@ DWORD WINAPI MainThread(LPVOID lpReserved) {
 	MessageBox(window, "Attach", NULL, MB_OK | MB_SYSTEMMODAL);
 	DoResumeThread(pID, tID);
 #endif
-
 	// init imgui
 	bool init_hook = false;
 	do {

@@ -5,8 +5,7 @@
 
 #include "../utils/config.hpp"
 
-class ReplicantHook
-{
+class ReplicantHook {
 public:
 	// toggle bools
 	static bool _hooked;
@@ -20,13 +19,6 @@ public:
 	static bool dealNoDamage_toggle;
 	
 	// values
-	static int health;
-	static float magic;
-	static int level;
-	static double playtime;
-	static float x;
-	static float y;
-	static float z;
 	static int gold;
 	static int XP;
 	static const char* zone;
@@ -50,15 +42,6 @@ public:
 	static void dealNoDamage(bool enabled);
 	static void takeNoDamage(bool enabled);
 	static void InfiniteMagic(bool enabled);
-	static void setZone(std::string value);
-	static void setName(std::string value);
-	static void setHealth(int value);
-	static void setMagic(float value);
-	static void setLevel(int value);
-	static void setPlaytime(double value);
-	static void setX(float value);
-	static void setY(float value);
-	static void setZ(float value);
 	static void forceCharSelect(int character);
 	static void forceEndgameStats(bool enabled);
 
