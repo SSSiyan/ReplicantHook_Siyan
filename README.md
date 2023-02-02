@@ -9,3 +9,5 @@ Check out the <a href="https://github.com/SSSiyan/ReplicantHook_Siyan/wiki/Featu
   <li>Open the game as you usually would through steam. After a few seconds, you'll be able to open the hook with the DELETE key</li>
   <li>You can save your settings by pressing the "Save config" button, and your settings will be automatically loaded next time you open the game</li>
 </ul>
+
+![NieR_Replicant_ver 1 22474487139_VNzv7LcbbL](https://user-images.githubusercontent.com/58395132/216272319-901bab1a-d86d-4fc8-9a87-be13921ae8e2.jpg)
