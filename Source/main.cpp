@@ -657,7 +657,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::PushItemWidth(inputItemWidth / 5);
 					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
 					ImGui::PopItemWidth();
-					if (index % 2 == 0)
+					if (index % 2 == 0 && index != recoveryInventoryVec.size())
 						ImGui::SameLine(sameLineWidth);
 					index++;
 				}
@@ -669,7 +669,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::PushItemWidth(inputItemWidth / 5);
 					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
 					ImGui::PopItemWidth();
-					if (index % 2 == 0)
+					if (index % 2 == 0 && index != cultivationInventoryVec.size())
 						ImGui::SameLine(sameLineWidth);
 					index++;
 				}
@@ -681,7 +681,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::PushItemWidth(inputItemWidth / 5);
 					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
 					ImGui::PopItemWidth();
-					if (index % 2 == 0)
+					if (index % 2 == 0  && index != fishingInventoryVec.size())
 						ImGui::SameLine(sameLineWidth);
 					index++;
 				}
@@ -693,7 +693,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::PushItemWidth(inputItemWidth / 5);
 					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
 					ImGui::PopItemWidth();
-					if (index % 2 == 0)
+					if (index % 2 == 0 && index != materialsInventoryVec.size())
 						ImGui::SameLine(sameLineWidth);
 					index++;
 				}
@@ -705,7 +705,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 					ImGui::PushItemWidth(inputItemWidth / 5);
 					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
 					ImGui::PopItemWidth();
-					if (index % 2 == 0)
+					if (index % 2 == 0 && index != keyInventoryVec.size())
 						ImGui::SameLine(sameLineWidth);
 					index++;
 				}
