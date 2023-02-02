@@ -1,28 +1,21 @@
 #include "ReplicantHook.hpp"
 
 // toggle bools
-bool ReplicantHook::cursorForceHidden_toggle(false);
-bool ReplicantHook::forceModelsVisible_toggle(false);
-bool ReplicantHook::infiniteJumps_toggle(false);
-bool ReplicantHook::infiniteAirCombos_toggle(false);
-bool ReplicantHook::forceCharSelect_toggle(false);
-bool ReplicantHook::spoiler_toggle(false);
-bool ReplicantHook::takeNoDamage_toggle(false);
-bool ReplicantHook::dealNoDamage_toggle(false);
-
-// values
-int ReplicantHook::gold(NULL);
-int ReplicantHook::XP(NULL);
-const char* ReplicantHook::zone;
-const char* ReplicantHook::name;
-float ReplicantHook::xyzpos[3]{ 0.0f, 0.0f, 0.0f };
+bool ReplicantHook::cursorForceHidden_toggle = false;
+bool ReplicantHook::forceModelsVisible_toggle = false;
+bool ReplicantHook::infiniteJumps_toggle = false;
+bool ReplicantHook::infiniteAirCombos_toggle = false;
+bool ReplicantHook::forceCharSelect_toggle = false;
+bool ReplicantHook::spoiler_toggle = false;
+bool ReplicantHook::takeNoDamage_toggle = false;
+bool ReplicantHook::dealNoDamage_toggle = false;
+bool ReplicantHook::infiniteMagic_toggle = false;
 int ReplicantHook::forceCharSelect_num(0);
 
 // dev values
 uintptr_t ReplicantHook::_baseAddress(NULL);
 DWORD ReplicantHook::_pID(NULL);
 bool ReplicantHook::_hooked(false);
-uintptr_t ReplicantHook::actorPlayable(NULL);
 
 // patches
 void ReplicantHook::cursorForceHidden(bool enabled) { // disables the game displaying the cursor when using a gamepad
@@ -59,16 +52,9 @@ void ReplicantHook::infiniteAirCombos(bool enabled) {
 
 void ReplicantHook::takeNoDamage(bool enabled) {
 	if (enabled)
-		_nop((char*)(ReplicantHook::_baseAddress + 0x5F72DED), 5);
+		_nop((char*)(ReplicantHook::_baseAddress + 0x3BE25D), 5);
 	else
-		_patch((char*)(ReplicantHook::_baseAddress + 0x5F72DED), (char*)"\x44\x89\x44\x81\x4C", 5);
-}
-
-void ReplicantHook::InfiniteMagic(bool enabled) {
-	if (enabled)
-		_nop((char*)(ReplicantHook::_baseAddress + 0x3BE2BE), 6);
-	else
-		_patch((char*)(ReplicantHook::_baseAddress + 0x3BE2BE), (char*)"\xF3\x0F\x11\x54\x81\x58", 6);
+		_patch((char*)(ReplicantHook::_baseAddress + 0x3BE25D), (char*)"\x44\x89\x44\x81\x4C", 5);
 }
 
 void ReplicantHook::dealNoDamage(bool enabled) {
@@ -78,7 +64,15 @@ void ReplicantHook::dealNoDamage(bool enabled) {
 		_patch((char*)(ReplicantHook::_baseAddress + 0x2A63BE), (char*)"\x89\xBB\xEC\x02\x00\x00", 6);
 }
 
-// setters
+void ReplicantHook::infiniteMagic(bool enabled) {
+	if (enabled)
+		_nop((char*)0x7FF6981EE2BE, 6);
+	else
+		_patch((char*)0x7FF6981EE2BE, (char*)"\xF3\x0F\x11\x54\x81\x58", 6);
+}
+
+//
+
 void ReplicantHook::stealCursor(bool enabled) {
 	if (enabled) {
 		(*(bool*)(ReplicantHook::_baseAddress + 0x443E48F)) = true; // show cursor
@@ -92,14 +86,6 @@ void ReplicantHook::stealCursor(bool enabled) {
 
 void ReplicantHook::forceEndgameStats(bool enabled) {
 	(*(bool*)(ReplicantHook::_baseAddress + 0x435AF40)) = true;
-}
-
-void ReplicantHook::setGold(int value) {
-	(*(int*)(ReplicantHook::_baseAddress + 0x4374ADC)) = value;
-}
-
-void ReplicantHook::setXP(int value) {
-	(*(int*)(ReplicantHook::_baseAddress + 0x4374A90)) = value;
 }
 
 void ReplicantHook::forceCharSelect(int character) {
@@ -151,67 +137,46 @@ void ReplicantHook::_nop(char* dst, unsigned int size) {
 	VirtualProtect(dst, size, oldprotect, &oldprotect);
 }
 
-// called on tick
-void ReplicantHook::update() {
-	ReplicantHook::actorPlayable = (*(uintptr_t*)(ReplicantHook::_baseAddress + 0x26F9560));
-	ReplicantHook::gold = (*(int*)(ReplicantHook::_baseAddress + 0x4374ADC));
-	ReplicantHook::XP = (*(int*)(ReplicantHook::_baseAddress + 0x4374A90));
-	ReplicantHook::zone = (const char*)_baseAddress + 0x4374A24;
-	ReplicantHook::name = (const char*)_baseAddress + 0x4374A4C;
-
-	// show 0 rather than junk values on boot
-	if (ReplicantHook::actorPlayable != 0) {
-		ReplicantHook::xyzpos[0] = (*(float*)(ReplicantHook::actorPlayable + 0x9C));
-		ReplicantHook::xyzpos[1] = (*(float*)(ReplicantHook::actorPlayable + 0xAC));
-		ReplicantHook::xyzpos[2] = (*(float*)(ReplicantHook::actorPlayable + 0xBC));
-	}
-
-	// if char select is enabled, write the char
-	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle) {
-		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-
-		// if character is 4, force old save stats
-		if (ReplicantHook::forceCharSelect_num == 4) {
-			ReplicantHook::forceEndgameStats(true);
-		}
-	}
-}
-
 void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
-	cursorForceHidden_toggle = cfg.get<bool>("cursorForceHidden").value_or(false);
+	cursorForceHidden_toggle = cfg.get<bool>("cursorForceHiddenToggle").value_or(false);
 	cursorForceHidden(cursorForceHidden_toggle);
 
-	forceModelsVisible_toggle = cfg.get<bool>("forceModelsVisible").value_or(false);
+	forceModelsVisible_toggle = cfg.get<bool>("forceModelsVisibleToggle").value_or(false);
 	forceModelsVisible(forceModelsVisible_toggle);
 
-	infiniteJumps_toggle = cfg.get<bool>("infiniteJumps").value_or(false);
+	infiniteJumps_toggle = cfg.get<bool>("infiniteJumpsToggle").value_or(false);
 	infiniteJumps(infiniteJumps_toggle);
 
-	infiniteAirCombos_toggle = cfg.get<bool>("infiniteAirCombos").value_or(false);
+	infiniteAirCombos_toggle = cfg.get<bool>("infiniteAirCombosToggle").value_or(false);
 	infiniteAirCombos(infiniteAirCombos_toggle);
 
-	spoiler_toggle = cfg.get<bool>("spoiler").value_or(false);
+	spoiler_toggle = cfg.get<bool>("spoilerToggle").value_or(false);
 
-	forceCharSelect_toggle = cfg.get<bool>("forceCharSelect").value_or(false);
+	forceCharSelect_toggle = cfg.get<bool>("forceCharSelectToggle").value_or(false);
 	forceCharSelect(forceCharSelect_toggle);
 
-	forceCharSelect_num = cfg.get<int>("forceCharSelectNum").value_or(0);
+	forceCharSelect_num = cfg.get<int>("forceCharSelectValue").value_or(0);
 
-	takeNoDamage_toggle = cfg.get<bool>("takeNoDamage").value_or(false);
+	takeNoDamage_toggle = cfg.get<bool>("takeNoDamageToggle").value_or(false);
 	takeNoDamage(takeNoDamage_toggle);
 
-	dealNoDamage_toggle = cfg.get<bool>("dealNoDamage").value_or(false);
+	dealNoDamage_toggle = cfg.get<bool>("dealNoDamageToggle").value_or(false);
 	dealNoDamage(dealNoDamage_toggle);
+
+	infiniteMagic_toggle = cfg.get<bool>("infiniteMagicToggle").value_or(false);
+	infiniteMagic(infiniteMagic_toggle);
 };
 
 void ReplicantHook::onConfigSave(utils::Config& cfg) {
-	cfg.set<bool>("cursorForceHidden", cursorForceHidden_toggle);
-	cfg.set<bool>("forceModelsVisible", forceModelsVisible_toggle);
-	cfg.set<bool>("infiniteJumps", infiniteJumps_toggle);
-	cfg.set<bool>("spoiler", spoiler_toggle);
-	cfg.set<bool>("forceCharSelect", forceCharSelect_toggle);
-	cfg.set<int>("forceCharSelectNum", forceCharSelect_num);
-	cfg.set<bool>("takeNoDamage", takeNoDamage_toggle);
-	cfg.set<bool>("dealNoDamage", dealNoDamage_toggle);
+	cfg.set<bool>("cursorForceHiddenToggle", cursorForceHidden_toggle);
+	cfg.set<bool>("forceModelsVisibleToggle", forceModelsVisible_toggle);
+	cfg.set<bool>("infiniteJumpsToggle", infiniteJumps_toggle);
+	cfg.set<bool>("spoilerToggle", spoiler_toggle);
+	cfg.set<bool>("forceCharSelectToggle", forceCharSelect_toggle);
+	cfg.set<int>("forceCharSelectNumValue", forceCharSelect_num);
+	cfg.set<bool>("takeNoDamageToggle", takeNoDamage_toggle);
+	cfg.set<bool>("dealNoDamageToggle", dealNoDamage_toggle);
+	cfg.set<bool>("infiniteMagicToggle", infiniteMagic_toggle);
+
 	cfg.save("Replicant_Hook.cfg");
 };
