@@ -251,7 +251,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
 	ImGui::SetNextWindowSize(ImVec2(trainerWidth, trainerVariableHeight)), ImGuiCond_Always;
 
-	ImGui::Begin("Siyan's Replicant Hook 1.31", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("Siyan's Replicant Hook 1.32", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
 	trainerWidth = 40.0f * ImGui::GetFontSize();
 	trainerMaxHeight = ImGui::GetIO().DisplaySize.y * 0.6f;
