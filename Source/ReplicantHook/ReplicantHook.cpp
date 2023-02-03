@@ -66,12 +66,10 @@ void ReplicantHook::dealNoDamage(bool enabled) {
 
 void ReplicantHook::infiniteMagic(bool enabled) {
 	if (enabled)
-		_nop((char*)0x7FF6981EE2BE, 6);
+		_nop((char*)ReplicantHook::_baseAddress + 0x3BE2BE, 6);
 	else
-		_patch((char*)0x7FF6981EE2BE, (char*)"\xF3\x0F\x11\x54\x81\x58", 6);
+		_patch((char*)ReplicantHook::_baseAddress + 0x3BE2BE, (char*)"\xF3\x0F\x11\x54\x81\x58", 6);
 }
-
-//
 
 void ReplicantHook::stealCursor(bool enabled) {
 	if (enabled) {

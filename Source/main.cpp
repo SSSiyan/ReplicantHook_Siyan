@@ -265,17 +265,17 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	if (ImGui::BeginTabBar("Trainer", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_NoTooltip)) {
 		// static values
-		int* playerLevel			= (int*)0x7FF69C1A4A84;
-		int* playerXP				= (int*)0x7FF69C1A4A90;
-		int* playerGold			= (int*)0x7FF69C1A4ADC;
-		int* playerHP			= (int*)0x7FF69C1A4A6C;
-		float* playerMP			= (float*)0x7FF69C1A4A78;
-		const char* playerZone	= (const char*)0x7FF69C1A4A24;
-		const char* playerName	= (const char*)0x7FF69C1A4A4C;
-		bool* playerEndgame     = (bool*)0x7FF69C18AF40;
+		int* playerLevel		= (int*)(ReplicantHook::_baseAddress + 0x4374A84);
+		int* playerXP			= (int*)(ReplicantHook::_baseAddress + 0x4374A90);
+		int* playerGold			= (int*)(ReplicantHook::_baseAddress + 0x4374ADC);
+		int* playerHP			= (int*)(ReplicantHook::_baseAddress + 0x4374A6C);
+		float* playerMP			= (float*)(ReplicantHook::_baseAddress + 0x4374A78);
+		const char* playerZone	= (const char*)(ReplicantHook::_baseAddress + 0x4374A24);
+		const char* playerName	= (const char*)(ReplicantHook::_baseAddress + 0x4374A4C);
+		bool* playerEndgame     = (bool*)(ReplicantHook::_baseAddress + 0x435AF40);
 
 		// character values
-		uintptr_t* actorPtr		= (uintptr_t*)0x7FF69A529560;
+		uintptr_t* actorPtr		= (uintptr_t*)(ReplicantHook::_baseAddress + 0x26F9560);
 		uintptr_t actorBase		= *actorPtr;
 		float* playerXPos		= (float*)(actorBase + 0x9C);
 		float* playerYPos		= (float*)(actorBase + 0xAC);
