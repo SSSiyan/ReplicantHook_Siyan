@@ -4,29 +4,33 @@
 #include <iostream>
 #include <array>
 #include <vector>
-#include "kiero/kiero.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
 #include <dinput.h>
 #include <shlobj_core.h>
 
+#define EXCLUDE_RHOOK_D3D9
+#define EXCLUDE_RHOOK_D3D10
+#define EXCLUDE_RHOOK_D3D12
+#define EXCLUDE_RHOOK_OGL
+#define EXCLUDE_RHOOK_VULKAN
+#define EXCLUDE_RHOOK_PRESENTHOOK
+#define EXCLUDE_RHOOK_UTILITY
+#include <RenderHook.hpp>
+
 #include "ReplicantHook/ReplicantHook.hpp"
 #include <algorithm>
 
-typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef uintptr_t PTR;
-typedef HRESULT(__stdcall* ResizeBuffers)(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-Present oPresent;
 HWND window = NULL;
 WNDPROC oWndProc;
 ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
 ID3D11RenderTargetView* mainRenderTargetView;
 HMODULE g_dinput = 0;
-ResizeBuffers oResizeBuffers;
 
 extern "C" {
 	__declspec(dllexport) HRESULT WINAPI direct_input8_create(HINSTANCE hinst, DWORD dw_version, const IID& riidltf, LPVOID* ppv_out, LPUNKNOWN punk_outer) {
@@ -74,12 +78,63 @@ void OpenedHook() {
 		ReplicantHook::stealCursor(false);
 }
 
-LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+void __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	
+	static bool deleteWasDown = false;
+	static bool insertWasDown = false;
+
+	if (uMsg == WM_KEYDOWN)
+	{
+		// keybinds
+		switch (wParam)
+		{
+			// open menu
+			case VK_DELETE:
+			if (!deleteWasDown) {
+				OpenedHook();
+				deleteWasDown = true;
+			}break;
+
+			// toggle gamepad cursor display
+			case VK_INSERT:
+			if(!insertWasDown)
+			{
+				ReplicantHook::cursorForceHidden_toggle = !ReplicantHook::cursorForceHidden_toggle;
+				ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
+				insertWasDown = true;
+			}break;
+
+			default:
+				break;
+		}
+	}
+
+	if (uMsg == WM_KEYDOWN)
+	{
+		// keybinds
+		switch (wParam)
+		{
+			// open menu
+		case VK_DELETE:
+			deleteWasDown = false;
+			break;
+
+			// toggle gamepad cursor display
+		case VK_INSERT:
+			insertWasDown = false;
+		break;
+
+		default:
+			break;
+		}
+	}
+
+	if (!imguiInit) {
+		return;
+	}
 
 	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
-	
-	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+		return;
 }
 
 // 4hook styling
@@ -153,36 +208,15 @@ void InitImGui() {
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
 
-HRESULT hkResizeBuffers(IDXGISwapChain* pThis, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+void hkResizeBuffers(RHook::D3D11Hook* pd3d11Hook) {
+	imguiInit = false;
+
+	ImGui_ImplDX11_Shutdown();
+
     if (mainRenderTargetView) {
         pContext->OMSetRenderTargets(0, 0, 0);
         mainRenderTargetView->Release();
     }
-
-    HRESULT hr = oResizeBuffers(pThis, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-
-    ID3D11Texture2D* pBuffer;
-    pThis->GetBuffer(0, __uuidof(ID3D11Texture2D),
-        (void**)&pBuffer);
-    // Perform error handling here!
-
-    pDevice->CreateRenderTargetView(pBuffer, NULL, &mainRenderTargetView);
-
-    // Perform error handling here!
-    pBuffer->Release();
-
-    pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-
-    // Set up the viewport.
-    D3D11_VIEWPORT vp;
-    vp.Width = Width;
-    vp.Height = Height;
-    vp.MinDepth = 0.0f;
-    vp.MaxDepth = 1.0f;
-    vp.TopLeftX = 0;
-    vp.TopLeftY = 0;
-    pContext->RSSetViewports(1, &vp);
-    return hr;
 }
 
 void InitHook() {
@@ -193,7 +227,11 @@ void InitHook() {
 	ReplicantHook::onConfigLoad(cfg);
 }
 
-HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
+std::unique_ptr<WindowsMessageHook> g_WindowsMessageHook{};
+
+void __stdcall hkPresent(RHook::D3D11Hook* pd3d11Hook) {
+	IDXGISwapChain* pSwapChain = pd3d11Hook->GetPresentParams().swapChain.get();
+
 	if (!imguiInit) {
 		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)& pDevice))) {
 			pDevice->GetImmediateContext(&pContext);
@@ -204,13 +242,21 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)& pBackBuffer);
 			pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
 			pBackBuffer->Release();
-			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
+			g_WindowsMessageHook.reset();
+			g_WindowsMessageHook = std::make_unique<WindowsMessageHook>(window);
+
+			g_WindowsMessageHook->OnPreMessage([&](WindowsMessageHook&) {
+				auto& params = g_WindowsMessageHook->GetWNDPROCParams();
+
+				WndProc(params.hWnd, params.Msg, params.wParam, params.lParam);
+			});
+
 			InitImGui();
 			InitHook();
 			imguiInit = true;
 		}
 		else
-			return oPresent(pSwapChain, SyncInterval, Flags);
+			return;
 	}
 
 	// check process ID is valid
@@ -218,21 +264,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		goto imgui_finish;
 	}
 
-	// keybinds
-	// open menu
-	if (GetAsyncKeyState(VK_DELETE) & 1) {
-		OpenedHook();
-	}
-	// toggle gamepad cursor display
-	if (GetAsyncKeyState(VK_INSERT) & 1) {
-		ReplicantHook::cursorForceHidden_toggle =! ReplicantHook::cursorForceHidden_toggle;
-		ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
-	}
-
 	// force character on tick
 	if (ReplicantHook::forceCharSelect_toggle && ReplicantHook::spoiler_toggle) {
 		ReplicantHook::forceCharSelect(ReplicantHook::forceCharSelect_num);
-
+	
 		// if character is 4, force old save stats
 		if (ReplicantHook::forceCharSelect_num == 4) {
 			ReplicantHook::forceEndgameStats(true);
@@ -241,9 +276,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 
 	// if display is toggled off, don't display imgui menu
 	if (!imguiDraw) {
-		goto imgui_finish;
+		return;
 	}
-
 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -262,7 +296,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	if (ImGui::Button("Save config")) {
 		ReplicantHook::onConfigSave(cfg);
 	}
-
+	
 	if (ImGui::BeginTabBar("Trainer", ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_NoTooltip)) {
 		// static values
 		int* playerLevel		= (int*)(ReplicantHook::_baseAddress + 0x4374A84);
@@ -776,10 +810,10 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			if (ImGui::IsItemClicked()) {
 				ShellExecuteA(NULL, "open", "https://github.com/ocornut/imgui", NULL, NULL, SW_SHOWNORMAL);
 			}
-			ImGui::Text("Which was built using Kiero by rdbo:\n");
-			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/rdbo/ImGui-DirectX-11-Kiero-Hook");
+			ImGui::Text("Which was hooked using RHook by Darkness\n");
+			ImGui::TextColored(ImVec4(0.356f, 0.764f, 0.960f, 1.0f), "github.com/amir-120/RHook");
 			if (ImGui::IsItemClicked()) {
-				ShellExecuteA(NULL, "open", "https://github.com/rdbo/ImGui-DirectX-11-Kiero-Hook", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecuteA(NULL, "open", "https://github.com/amir-120/RHook", NULL, NULL, SW_SHOWNORMAL);
 			}
 			ImGui::Separator();
 			ImGui::Text("Find updates for ReplicantHook_Siyan:\n");
@@ -810,13 +844,14 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		}
 		ImGui::EndTabBar();
 	}
+
 	ImGui::End();
 	ImGui::Render();
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 imgui_finish:
-	return oPresent(pSwapChain, SyncInterval, Flags);
+	return;
 }
 
 // Pass 0 as the targetProcessId to suspend threads in the current process
@@ -869,7 +904,12 @@ void DoResumeThread(DWORD targetProcessId, DWORD targetThreadId) {
 	}
 }
 
+std::unique_ptr<RHook::D3D11Hook> g_D3D11Hook;
+std::recursive_mutex g_HookMonitorMutex{};
+
 DWORD WINAPI MainThread(LPVOID lpReserved) {
+	RHook::Init();
+
 	wchar_t buffer[MAX_PATH]{ 0 };
 	if (GetSystemDirectoryW(buffer, MAX_PATH) != 0) {
 		// Org dinput8.dll
@@ -890,26 +930,29 @@ DWORD WINAPI MainThread(LPVOID lpReserved) {
 	DoResumeThread(pID, tID);
 #endif
 	// init imgui
-	bool init_hook = false;
-	do {
-		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success) {
-			kiero::bind(8, (void**)&oPresent, hkPresent);
-			kiero::bind(13, (void**)&oResizeBuffers, hkResizeBuffers);
-			init_hook = true;
-		}
-	} while (!init_hook);
+	g_D3D11Hook = std::make_unique<RHook::D3D11Hook>(&g_HookMonitorMutex);
+
+	g_D3D11Hook->OnPrePresent([&](RHook::DXGIHook&) { hkPresent(g_D3D11Hook.get()); });
+	g_D3D11Hook->OnPreResizeBuffers([&](RHook::DXGIHook&) { hkResizeBuffers(g_D3D11Hook.get()); });
+
+	if (!g_D3D11Hook->Hook()) {
+		printf("[D3D11] Failed to hook d3d11!");
+	}
 
 	return TRUE;
 }
 
 BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
+	if (RHook::IsHelperProcess()) {
+		return TRUE;
+	}
+
 	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hMod);
 		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
 		break;
 	case DLL_PROCESS_DETACH:
-		kiero::shutdown();
 		break;
 	}
 	return TRUE;
