@@ -13,6 +13,9 @@
     <Filter Include="Source">
       <UniqueIdentifier>{072d4111-5e85-488a-a262-c2b539e7d088}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Mods">
+      <UniqueIdentifier>{e622e814-7461-4792-b435-6eb8e73ab58f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -57,6 +60,9 @@
     <ClInclude Include="utils\Detour.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="mods\SampleMod.hpp">
+      <Filter>Mods</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\imgui.cpp">
@@ -95,5 +101,13 @@
     <ClCompile Include="utils\Detour.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="mods\SampleMod.cpp">
+      <Filter>Mods</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="mods\SampleMod.asm">
+      <Filter>Mods</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

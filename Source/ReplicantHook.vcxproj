@@ -27,6 +27,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="mods\SampleMod.hpp" />
     <ClInclude Include="ReplicantHook\ReplicantHook.hpp" />
     <ClInclude Include="utils\config.hpp" />
     <ClInclude Include="utils\Detour.hpp" />
@@ -42,11 +43,17 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mods\SampleMod.cpp" />
     <ClCompile Include="ReplicantHook\ReplicantHook.cpp" />
     <ClCompile Include="utils\config.cpp" />
     <ClCompile Include="utils\Detour.cpp" />
     <ClCompile Include="utils\String.cpp" />
     <ClCompile Include="utils\Timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="mods\SampleMod.asm">
+      <FileType>Document</FileType>
+    </MASM>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -84,6 +91,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -191,5 +199,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>
