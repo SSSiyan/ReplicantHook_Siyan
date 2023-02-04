@@ -83,7 +83,7 @@ void ReplicantHook::stealCursor(bool enabled) {
 }
 
 void ReplicantHook::forceEndgameStats(bool enabled) {
-	(*(bool*)(ReplicantHook::_baseAddress + 0x435AF40)) = true;
+	(*(bool*)(ReplicantHook::_baseAddress + 0x435AF40)) = true; // playerEndgame in main.cpp
 }
 
 void ReplicantHook::forceCharSelect(int character) {
@@ -135,6 +135,13 @@ void ReplicantHook::_nop(char* dst, unsigned int size) {
 	VirtualProtect(dst, size, oldprotect, &oldprotect);
 }
 
+void ReplicantHook::under_line(const ImColor& col) {
+	ImVec2 min = ImGui::GetItemRectMin();
+	ImVec2 max = ImGui::GetItemRectMax();
+	min.y = max.y;
+	ImGui::GetWindowDrawList()->AddLine(min, max, col, 1.0f);
+}
+
 void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
 	cursorForceHidden_toggle = cfg.get<bool>("cursorForceHiddenToggle").value_or(false);
 	cursorForceHidden(cursorForceHidden_toggle);
@@ -176,5 +183,5 @@ void ReplicantHook::onConfigSave(utils::Config& cfg) {
 	cfg.set<bool>("dealNoDamageToggle", dealNoDamage_toggle);
 	cfg.set<bool>("infiniteMagicToggle", infiniteMagic_toggle);
 
-	cfg.save("Replicant_Hook.cfg");
+	cfg.save(cfgString);
 };

@@ -1,7 +1,5 @@
+/*
 #include "SampleMod.hpp"
-#include "../utils/Detour.hpp"
-#include <memory>
-
 std::unique_ptr<utility::Detour_t> g_Detour1{}, g_Detour2{};
 
 extern "C" {
@@ -33,3 +31,4 @@ bool InitializeSampleMod2() {
 
 	return g_SampleMod_ReturnAddr2 != nullptr ? true : false;
 }
+*/

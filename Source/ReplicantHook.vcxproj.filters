@@ -63,6 +63,9 @@
     <ClInclude Include="mods\SampleMod.hpp">
       <Filter>Mods</Filter>
     </ClInclude>
+    <ClInclude Include="ReplicantHook\LicenseStrings.hpp">
+      <Filter>ReplicantHook</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\imgui.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="mods\SampleMod.cpp">
       <Filter>Mods</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicantHook\GameGui.cpp">
+      <Filter>ReplicantHook</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

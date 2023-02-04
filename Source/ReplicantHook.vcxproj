@@ -28,6 +28,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="mods\SampleMod.hpp" />
+    <ClInclude Include="ReplicantHook\LicenseStrings.hpp" />
     <ClInclude Include="ReplicantHook\ReplicantHook.hpp" />
     <ClInclude Include="utils\config.hpp" />
     <ClInclude Include="utils\Detour.hpp" />
@@ -44,6 +45,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mods\SampleMod.cpp" />
+    <ClCompile Include="ReplicantHook\GameGui.cpp" />
     <ClCompile Include="ReplicantHook\ReplicantHook.cpp" />
     <ClCompile Include="utils\config.cpp" />
     <ClCompile Include="utils\Detour.cpp" />
@@ -79,7 +81,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
