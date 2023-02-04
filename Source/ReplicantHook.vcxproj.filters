@@ -54,6 +54,9 @@
     <ClInclude Include="utils\Timer.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="utils\Detour.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\imgui.cpp">
@@ -88,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Detour.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
