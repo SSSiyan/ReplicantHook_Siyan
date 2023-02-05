@@ -29,6 +29,8 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="mods\SampleMod.hpp" />
     <ClInclude Include="ReplicantHook\LicenseStrings.hpp" />
+    <ClInclude Include="ReplicantHook\Mod.hpp" />
+    <ClInclude Include="ReplicantHook\Mods.hpp" />
     <ClInclude Include="ReplicantHook\ReplicantHook.hpp" />
     <ClInclude Include="utils\config.hpp" />
     <ClInclude Include="utils\Detour.hpp" />
@@ -46,6 +48,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mods\SampleMod.cpp" />
     <ClCompile Include="ReplicantHook\GameGui.cpp" />
+    <ClCompile Include="ReplicantHook\Mods.cpp" />
     <ClCompile Include="ReplicantHook\ReplicantHook.cpp" />
     <ClCompile Include="utils\config.cpp" />
     <ClCompile Include="utils\Detour.cpp" />
@@ -135,7 +138,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ReplicantHook;$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -152,7 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ReplicantHook;$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -170,7 +173,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ReplicantHook;$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -191,7 +194,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ReplicantHook;$(ProjectDir)MSDetours/src;$(ProjectDir)dark/src/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
