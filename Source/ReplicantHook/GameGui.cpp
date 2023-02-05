@@ -54,7 +54,6 @@ void ReplicantHook::gameGui(void) {
 		float* playerMP			= (float*)(ReplicantHook::_baseAddress + ReplicantHook::playerMP);
 		const char* playerZone	= (const char*)(ReplicantHook::_baseAddress + ReplicantHook::playerZone);
 		const char* playerName	= (const char*)(ReplicantHook::_baseAddress + ReplicantHook::playerName);
-		bool* playerEndgame     = (bool*)(ReplicantHook::_baseAddress + ReplicantHook::playerEndgame);
 
 		// character values
 		uintptr_t* actorPtr		= (uintptr_t*)(ReplicantHook::_baseAddress + playerActor);
@@ -145,81 +144,76 @@ void ReplicantHook::gameGui(void) {
 
 		if (ImGui::BeginTabItem("Inventory")) {
 			ImGui::BeginChild("InventoryChild");
-			if (ReplicantHook::_baseAddress) {
-				ImGui::Text("Recovery");
-				static bool frameOne = true;
-				for (auto& inventoryEntry : recoveryInventoryVec) {
-					static int index = 1;
-					uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
-					int* inventoryItem = (int*)inventoryItemAddress;
-					ImGui::PushItemWidth(inputItemWidth / 5);
-					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
-					ImGui::PopItemWidth();
-					if (index != recoveryInventoryVec.size() && index % 2 != 0)
-						ImGui::SameLine(sameLineWidth);
-					if (index == recoveryInventoryVec.size())
-						index = 0;
-					index++;
-				}
-				ImGui::Text("Cultivation");
-				for (auto& inventoryEntry : cultivationInventoryVec) {
-					static int index = 1;
-					uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
-					int* inventoryItem = (int*)inventoryItemAddress;
-					ImGui::PushItemWidth(inputItemWidth / 5);
-					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
-					ImGui::PopItemWidth();
-					if (index != cultivationInventoryVec.size() && index % 2 != 0)
-						ImGui::SameLine(sameLineWidth);
-					if (index == cultivationInventoryVec.size())
-						index = 0;
-					index++;
-				}
-				ImGui::Text("Fishing");
-				for (auto& inventoryEntry : fishingInventoryVec) {
-					static int index = 1;
-					uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
-					int* inventoryItem = (int*)inventoryItemAddress;
-					ImGui::PushItemWidth(inputItemWidth / 5);
-					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
-					ImGui::PopItemWidth();
-					if (index != fishingInventoryVec.size() && index % 2 != 0)
-						ImGui::SameLine(sameLineWidth);
-					if (index == fishingInventoryVec.size())
-						index = 0;
-					index++;
-				}
-				ImGui::Text("Materials");
-				for (auto& inventoryEntry : materialsInventoryVec) {
-					static int index = 1;
-					uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
-					int* inventoryItem = (int*)inventoryItemAddress;
-					ImGui::PushItemWidth(inputItemWidth / 5);
-					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
-					ImGui::PopItemWidth();
-					if (index != materialsInventoryVec.size() && index % 2 != 0)
-						ImGui::SameLine(sameLineWidth);
-					if (index == materialsInventoryVec.size())
-						index = 0;
-					index++;
-				}
-				ImGui::Text("Key");
-				for (auto& inventoryEntry : keyInventoryVec) {
-					static int index = 1;
-					uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
-					int* inventoryItem = (int*)inventoryItemAddress;
-					ImGui::PushItemWidth(inputItemWidth / 5);
-					ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
-					ImGui::PopItemWidth();
-					if (index != keyInventoryVec.size() && index % 2 != 0)
-						ImGui::SameLine(sameLineWidth);
-					if (index == keyInventoryVec.size())
-						index = 0;
-					index++;
-				}
+			ImGui::Text("Recovery");
+			static bool frameOne = true;
+			for (auto& inventoryEntry : recoveryInventoryVec) {
+				static int index = 1;
+				uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
+				int* inventoryItem = (int*)inventoryItemAddress;
+				ImGui::PushItemWidth(inputItemWidth / 5);
+				ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
+				ImGui::PopItemWidth();
+				if (index != recoveryInventoryVec.size() && index % 2 != 0)
+					ImGui::SameLine(sameLineWidth);
+				if (index == recoveryInventoryVec.size())
+					index = 0;
+				index++;
 			}
-			else {
-				ImGui::Text("Game Not Loaded.");
+			ImGui::Text("Cultivation");
+			for (auto& inventoryEntry : cultivationInventoryVec) {
+				static int index = 1;
+				uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
+				int* inventoryItem = (int*)inventoryItemAddress;
+				ImGui::PushItemWidth(inputItemWidth / 5);
+				ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
+				ImGui::PopItemWidth();
+				if (index != cultivationInventoryVec.size() && index % 2 != 0)
+					ImGui::SameLine(sameLineWidth);
+				if (index == cultivationInventoryVec.size())
+					index = 0;
+				index++;
+			}
+			ImGui::Text("Fishing");
+			for (auto& inventoryEntry : fishingInventoryVec) {
+				static int index = 1;
+				uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
+				int* inventoryItem = (int*)inventoryItemAddress;
+				ImGui::PushItemWidth(inputItemWidth / 5);
+				ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
+				ImGui::PopItemWidth();
+				if (index != fishingInventoryVec.size() && index % 2 != 0)
+					ImGui::SameLine(sameLineWidth);
+				if (index == fishingInventoryVec.size())
+					index = 0;
+				index++;
+			}
+			ImGui::Text("Materials");
+			for (auto& inventoryEntry : materialsInventoryVec) {
+				static int index = 1;
+				uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
+				int* inventoryItem = (int*)inventoryItemAddress;
+				ImGui::PushItemWidth(inputItemWidth / 5);
+				ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
+				ImGui::PopItemWidth();
+				if (index != materialsInventoryVec.size() && index % 2 != 0)
+					ImGui::SameLine(sameLineWidth);
+				if (index == materialsInventoryVec.size())
+					index = 0;
+				index++;
+			}
+			ImGui::Text("Key");
+			for (auto& inventoryEntry : keyInventoryVec) {
+				static int index = 1;
+				uintptr_t inventoryItemAddress = ReplicantHook::_baseAddress + inventoryEntry.second;
+				int* inventoryItem = (int*)inventoryItemAddress;
+				ImGui::PushItemWidth(inputItemWidth / 5);
+				ImGui::InputScalar(inventoryEntry.first.c_str(), ImGuiDataType_U8, inventoryItem);
+				ImGui::PopItemWidth();
+				if (index != keyInventoryVec.size() && index % 2 != 0)
+					ImGui::SameLine(sameLineWidth);
+				if (index == keyInventoryVec.size())
+					index = 0;
+				index++;
 			}
 
 			trainerVariableHeight = std::clamp(ImGui::GetCursorPosY() + trainerHeightBorder, 0.0f, trainerMaxHeight);

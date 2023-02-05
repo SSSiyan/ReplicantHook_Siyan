@@ -21,12 +21,12 @@ uintptr_t ReplicantHook::playerHP = 0x4374A6C;
 uintptr_t ReplicantHook::playerMP = 0x4374A78;
 uintptr_t ReplicantHook::playerZone = 0x4374A24;
 uintptr_t ReplicantHook::playerName = 0x4374A4C;
-uintptr_t ReplicantHook::playerEndgame = 0x435AF40; // and cheat
 
-// other
+// system
 uintptr_t ReplicantHook::enableInput = 0x443E48E;
 uintptr_t ReplicantHook::showCursor = 0x443E48F; // 1 byte later
 uintptr_t ReplicantHook::currentCharacter = 0x4374A48;
+uintptr_t ReplicantHook::playerEndgame = 0x435AF40;
 
 // inventory
 std::vector<std::pair<std::string, uintptr_t>> ReplicantHook::recoveryInventoryVec;
@@ -94,6 +94,7 @@ void ReplicantHook::infiniteMagic(bool enabled) {
 		_patch((char*)ReplicantHook::_baseAddress + 0x3BE2BE, (char*)"\xF3\x0F\x11\x54\x81\x58", 6);
 }
 
+// static values
 void ReplicantHook::stealCursor(bool enabled) {
 	if (enabled) {
 		(*(bool*)(ReplicantHook::_baseAddress + enableInput)) = false; // disable game input
@@ -114,8 +115,7 @@ void ReplicantHook::forceCharSelect(int character) {
 }
 
 // dev functions
-void ReplicantHook::getInventoryAddresses(void) {
-	// Inventory
+void ReplicantHook::getInventoryAddresses(void) { // called in InitHook
 	// Recovery
 	recoveryInventoryVec.emplace_back<std::string, uintptr_t>("Medicinal Herb", 0x4374AE0);
 	recoveryInventoryVec.emplace_back<std::string, uintptr_t>("Health Salve", 0x4374AE1);
@@ -440,10 +440,8 @@ void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
 	infiniteAirCombos(infiniteAirCombos_toggle);
 
 	spoiler_toggle = cfg.get<bool>("spoilerToggle").value_or(false);
-
 	forceCharSelect_toggle = cfg.get<bool>("forceCharSelectToggle").value_or(false);
 	forceCharSelect(forceCharSelect_toggle);
-
 	forceCharSelect_num = cfg.get<int>("forceCharSelectNumValue").value_or(0);
 
 	takeNoDamage_toggle = cfg.get<bool>("takeNoDamageToggle").value_or(false);
@@ -460,6 +458,7 @@ void ReplicantHook::onConfigSave(utils::Config& cfg) {
 	cfg.set<bool>("cursorForceHiddenToggle", cursorForceHidden_toggle);
 	cfg.set<bool>("forceModelsVisibleToggle", forceModelsVisible_toggle);
 	cfg.set<bool>("infiniteJumpsToggle", infiniteJumps_toggle);
+	cfg.set<bool>("infiniteAirCombosToggle", infiniteAirCombos_toggle);
 	cfg.set<bool>("spoilerToggle", spoiler_toggle);
 	cfg.set<bool>("forceCharSelectToggle", forceCharSelect_toggle);
 	cfg.set<int>("forceCharSelectNumValue", forceCharSelect_num);

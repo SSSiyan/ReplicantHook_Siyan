@@ -31,7 +31,6 @@ public:
 	static void forceCharSelect(int character);
 	static void forceEndgameStats(bool enabled);
 
-	// inventory addresses
 	static void getInventoryAddresses(void);
 	static uintptr_t playerActor;
 	static uintptr_t playerLevel;
@@ -41,12 +40,12 @@ public:
 	static uintptr_t playerMP;
 	static uintptr_t playerZone;
 	static uintptr_t playerName;
-	static uintptr_t playerEndgame;
 
 	// other
 	static uintptr_t enableInput;
 	static uintptr_t showCursor;
 	static uintptr_t currentCharacter;
+	static uintptr_t playerEndgame;
 	static std::vector<std::pair<std::string, uintptr_t>> recoveryInventoryVec;
 	static std::vector<std::pair<std::string, uintptr_t>> cultivationInventoryVec;
 	static std::vector<std::pair<std::string, uintptr_t>> fishingInventoryVec;
