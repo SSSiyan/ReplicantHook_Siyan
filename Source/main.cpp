@@ -46,49 +46,23 @@ void OpenedHook() {
 }
 
 void __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	static bool deleteWasDown = false;
-	static bool insertWasDown = false;
-	if (uMsg == WM_KEYDOWN) {
-		// keybinds
-		switch (wParam) {
-			// open menu
-			case VK_DELETE:
-			if (!deleteWasDown) {
-				OpenedHook();
-				deleteWasDown = true;
-			}break;
-
-			// toggle gamepad cursor display
-			case VK_INSERT:
-			if(!insertWasDown) {
-				ReplicantHook::cursorForceHidden_toggle = !ReplicantHook::cursorForceHidden_toggle;
-				ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
-				insertWasDown = true;
-			}break;
-			default:
-				break;
-		}
+	if (!imguiInit) {
+		return;
 	}
 
 	if (uMsg == WM_KEYDOWN){
 		// keybinds
 		switch (wParam){
-			// open menu
-		case VK_DELETE:
-			deleteWasDown = false;
+		case VK_DELETE: // open menu
+			OpenedHook();
 			break;
-
-			// toggle gamepad cursor display
-		case VK_INSERT:
-			insertWasDown = false;
+		case VK_INSERT: // toggle cursor
+			ReplicantHook::cursorForceHidden_toggle = !ReplicantHook::cursorForceHidden_toggle;
+			ReplicantHook::cursorForceHidden(ReplicantHook::cursorForceHidden_toggle);
 			break;
 		default:
 			break;
 		}
-	}
-
-	if (!imguiInit) {
-		return;
 	}
 
 	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
@@ -181,6 +155,9 @@ void InitHook() {
 	// get process ID and module base address
 	ReplicantHook::_hook();
 
+	// get inventory addresses
+	ReplicantHook::getInventoryAddresses();
+
 	// load settings, must happen after hook
 	ReplicantHook::onConfigLoad(ReplicantHook::cfg);
 }
@@ -209,8 +186,12 @@ void __stdcall hkPresent(RHook::D3D11Hook* pd3d11Hook) {
 				WndProc(params.hWnd, params.Msg, params.wParam, params.lParam);
 			});
 
+			// create imgui context, apply style
 			InitImGui();
+
+			// get game addresses, onConfigLoad
 			InitHook();
+
 			imguiInit = true;
 		}
 		else
@@ -255,56 +236,6 @@ imgui_finish:
 	return;
 }
 
-// Pass 0 as the targetProcessId to suspend threads in the current process
-void DoSuspendThread(DWORD targetProcessId, DWORD targetThreadId) {
-	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-	if (h != INVALID_HANDLE_VALUE) {
-		THREADENTRY32 te;
-		te.dwSize = sizeof(te);
-		if (Thread32First(h, &te)) {
-			do {
-				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID)) {
-					// Suspend all threads EXCEPT the one we want to keep running
-					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId) {
-						HANDLE thread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
-						if (thread != NULL) {
-							SuspendThread(thread);
-							CloseHandle(thread);
-						}
-					}
-				}
-				te.dwSize = sizeof(te);
-			} while (Thread32Next(h, &te));
-		}
-		CloseHandle(h);
-	}
-}
-
-// Pass 0 as the targetProcessId to suspend threads in the current process
-void DoResumeThread(DWORD targetProcessId, DWORD targetThreadId) {
-	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-	if (h != INVALID_HANDLE_VALUE) {
-		THREADENTRY32 te;
-		te.dwSize = sizeof(te);
-		if (Thread32First(h, &te)) {
-			do {
-				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID)) {
-					// Suspend all threads EXCEPT the one we want to keep running
-					if (te.th32ThreadID != targetThreadId && te.th32OwnerProcessID == targetProcessId) {
-						HANDLE thread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, te.th32ThreadID);
-						if (thread != NULL) {
-							ResumeThread(thread);
-							CloseHandle(thread);
-						}
-					}
-				}
-				te.dwSize = sizeof(te);
-			} while (Thread32Next(h, &te));
-		}
-		CloseHandle(h);
-	}
-}
-
 std::unique_ptr<RHook::D3D11Hook> g_D3D11Hook;
 std::recursive_mutex g_HookMonitorMutex{};
 
@@ -322,14 +253,6 @@ DWORD WINAPI MainThread(LPVOID lpReserved) {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	// wait for game to load
 	// Sleep(10000);
-#ifdef DEBUG
-	// give user time to attach for debug
-	DWORD pID = GetCurrentProcessId();
-	DWORD tID = GetCurrentThreadId();
-	DoSuspendThread(pID, tID);
-	MessageBox(window, "Attach", NULL, MB_OK | MB_SYSTEMMODAL);
-	DoResumeThread(pID, tID);
-#endif
 	// init imgui
 	g_D3D11Hook = std::make_unique<RHook::D3D11Hook>(&g_HookMonitorMutex);
 
@@ -347,9 +270,11 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
 	if (RHook::IsHelperProcess()) {
 		return TRUE;
 	}
-
 	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
+#ifndef NDEBUG
+		//MessageBox(NULL, "Debug attach opportunity", "Debug", MB_ICONINFORMATION);
+#endif
 		DisableThreadLibraryCalls(hMod);
 		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
 		break;

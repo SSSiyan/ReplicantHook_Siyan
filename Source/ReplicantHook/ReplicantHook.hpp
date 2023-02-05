@@ -4,6 +4,7 @@
 #include <string>
 #include "../imgui/imgui.h"
 #include "../utils/config.hpp"
+#include <vector>
 
 class ReplicantHook {
 public:
@@ -29,6 +30,28 @@ public:
 	static int forceCharSelect_num;
 	static void forceCharSelect(int character);
 	static void forceEndgameStats(bool enabled);
+
+	// inventory addresses
+	static void getInventoryAddresses(void);
+	static uintptr_t playerActor;
+	static uintptr_t playerLevel;
+	static uintptr_t playerXP;
+	static uintptr_t playerGold;
+	static uintptr_t playerHP;
+	static uintptr_t playerMP;
+	static uintptr_t playerZone;
+	static uintptr_t playerName;
+	static uintptr_t playerEndgame;
+
+	// other
+	static uintptr_t enableInput;
+	static uintptr_t showCursor;
+	static uintptr_t currentCharacter;
+	static std::vector<std::pair<std::string, uintptr_t>> recoveryInventoryVec;
+	static std::vector<std::pair<std::string, uintptr_t>> cultivationInventoryVec;
+	static std::vector<std::pair<std::string, uintptr_t>> fishingInventoryVec;
+	static std::vector<std::pair<std::string, uintptr_t>> materialsInventoryVec;
+	static std::vector<std::pair<std::string, uintptr_t>> keyInventoryVec;
 
 	// dev
 	static DWORD _getProcessID(void);
