@@ -53,6 +53,14 @@ namespace utility {
 		return m_Trampoline;
 	}
 
+	void* Detour_t::Create(int64_t offset)
+	{
+		if (Create() == nullptr)
+			return nullptr;
+
+		return (void*)((uintptr_t)m_Original + offset);
+	}
+
 	bool Detour_t::Remove()
 	{
 		if (m_IsEnabled == false) {

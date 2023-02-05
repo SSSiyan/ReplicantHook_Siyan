@@ -1,9 +1,33 @@
 #pragma once
+#include "Mod.hpp"
 #include <memory>
-#include "../utils/Detour.hpp"
-#include "../ReplicantHook/ReplicantHook.hpp"
 
-extern std::unique_ptr<utility::Detour_t> g_Detour1, g_Detour2;
+class SampleMod : public Mod
+{
+public:
+	SampleMod()
+		: Mod("SampleName") // Name of the mod here
+	{}
 
-bool InitializeSampleMod1();
-bool InitializeSampleMod2();
+	std::optional<std::string> OnInitialize()	override; // Must define this function but can be empty and do nothing
+	void					   OnFrame()		override; // Must define this function but can be empty and do nothing
+	void					   OnDrawUi()		override; // Must define this function but can be empty and do nothing
+	void					   OnDestroy()		override; // Must define this function but can be empty and do nothing
+	bool					   IsInitialized()	override // Must define this function but can be empty and do nothing
+	{
+		return m_IsInitialized;
+	}
+
+private:
+	bool m_IsInitialized = false;
+
+	// Mod specific data goes here
+
+	std::unique_ptr<utility::Detour_t> m_Detour1{}, m_Detour2{};
+	
+	bool m_LastDetour1Enabled = false;
+	bool m_Detour1Enabled = false;
+
+	bool InitializeDetour1();
+	bool InitializeDetour2();
+};

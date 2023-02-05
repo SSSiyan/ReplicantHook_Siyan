@@ -7,7 +7,7 @@
 #include "imgui/imgui_impl_dx11.h"
 #include <dinput.h>
 #include "ReplicantHook/ReplicantHook.hpp"
-#include "mods/SampleMod.hpp"
+#include "Mods.hpp"
 
 #define EXCLUDE_RHOOK_D3D9
 #define EXCLUDE_RHOOK_D3D10
@@ -164,7 +164,12 @@ void InitHook() {
 	ReplicantHook::onConfigLoad(ReplicantHook::cfg);
 
 	// init detours
-	ReplicantHook::sampleMod1Init = InitializeSampleMod1();
+	if (auto err = Mods::GetInstance()->Initialize(); err.has_value()) 
+	{
+		printf(err.value().c_str());
+	}
+	
+	ReplicantHook::sampleMod1Init = Mods::GetMod("SampleMod")->IsInitialized();
 }
 
 std::unique_ptr<WindowsMessageHook> g_WindowsMessageHook{};

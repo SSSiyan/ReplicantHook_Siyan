@@ -15,7 +15,14 @@ namespace utility {
 		const auto& IsEnabled()			const { return m_IsEnabled; }
 		const auto& IsValid()			const { return m_IsValid; }
 
+		/*
+		* Returns the address to the original code (Trampoline)
+		*/
 		void*		Create();
+		/*
+		* Returns the aob address address offset by the value passed to it
+		*/
+		void*		Create(int64_t offset);
 		bool		Remove();
 
 		bool		Toggle();
