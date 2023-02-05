@@ -112,7 +112,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="mods\SampleMod.asm">
+    <MASM Include="mods\SampleModAsm.asm">
       <Filter>Mods</Filter>
     </MASM>
   </ItemGroup>

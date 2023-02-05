@@ -1,5 +1,7 @@
 #include "ReplicantHook.hpp"
 
+bool ReplicantHook::sampleMod1Init = false;
+
 // patch toggle bools
 bool ReplicantHook::cursorForceHidden_toggle = false;
 bool ReplicantHook::forceModelsVisible_toggle = false;

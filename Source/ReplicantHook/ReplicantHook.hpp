@@ -8,6 +8,8 @@
 
 class ReplicantHook {
 public:
+
+	static bool sampleMod1Init;
 	// patches
 	// static bool imguiDraw;
 	static void stealCursor(bool enabled);

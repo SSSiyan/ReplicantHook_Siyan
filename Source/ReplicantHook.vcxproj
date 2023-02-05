@@ -53,7 +53,7 @@
     <ClCompile Include="utils\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="mods\SampleMod.asm">
+    <MASM Include="mods\SampleModAsm.asm">
       <FileType>Document</FileType>
     </MASM>
   </ItemGroup>

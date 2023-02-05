@@ -7,9 +7,11 @@
 #include "imgui/imgui_impl_dx11.h"
 #include <dinput.h>
 #include "ReplicantHook/ReplicantHook.hpp"
+#include "mods/SampleMod.hpp"
 
 #define EXCLUDE_RHOOK_D3D9
 #define EXCLUDE_RHOOK_D3D10
+//#define EXCLUDE_RHOOK_D3D11
 #define EXCLUDE_RHOOK_D3D12
 #define EXCLUDE_RHOOK_OGL
 #define EXCLUDE_RHOOK_VULKAN
@@ -160,6 +162,9 @@ void InitHook() {
 
 	// load settings, must happen after hook
 	ReplicantHook::onConfigLoad(ReplicantHook::cfg);
+
+	// init detours
+	ReplicantHook::sampleMod1Init = InitializeSampleMod1();
 }
 
 std::unique_ptr<WindowsMessageHook> g_WindowsMessageHook{};
@@ -276,7 +281,7 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
 	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
 #ifndef NDEBUG
-		// MessageBox(NULL, "Debug attach opportunity", "Debug", MB_ICONINFORMATION);
+		MessageBox(NULL, "Debug attach opportunity", "Debug", MB_ICONINFORMATION);
 #endif
 		DisableThreadLibraryCalls(hMod);
 		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
