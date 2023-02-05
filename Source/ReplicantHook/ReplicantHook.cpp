@@ -44,11 +44,11 @@ bool ReplicantHook::_hooked(false);
 void ReplicantHook::cursorForceHidden(bool enabled) { // disables the game displaying the cursor when using a gamepad
 	if (enabled) {
 		ReplicantHook::_nop((char*)(ReplicantHook::_baseAddress + 0x3D48E9), 7);
-		(*(bool*)(ReplicantHook::_baseAddress + showCursor)) = false; // hide cursor
+		*(bool*)(ReplicantHook::_baseAddress + showCursor) = false; // hide cursor
 	}
 	else {
 		ReplicantHook::_patch((char*)(ReplicantHook::_baseAddress + 0x3D48E9), (char*)"\x40\x88\xB3\x8F\x00\x00\x00", 7);
-		(*(bool*)(ReplicantHook::_baseAddress + showCursor)) = true; // show cursor
+		*(bool*)(ReplicantHook::_baseAddress + showCursor) = true; // show cursor
 	}
 }
 
@@ -97,21 +97,21 @@ void ReplicantHook::infiniteMagic(bool enabled) {
 // static values
 void ReplicantHook::stealCursor(bool enabled) {
 	if (enabled) {
-		(*(bool*)(ReplicantHook::_baseAddress + enableInput)) = false; // disable game input
-		(*(bool*)(ReplicantHook::_baseAddress + showCursor)) = true; // show cursor
+		*(bool*)(ReplicantHook::_baseAddress + enableInput) = false; // disable game input
+		*(bool*)(ReplicantHook::_baseAddress + showCursor) = true; // show cursor
 	}
 	else {
-		(*(bool*)(ReplicantHook::_baseAddress + enableInput)) = true;  // enable game input
-		(*(bool*)(ReplicantHook::_baseAddress + showCursor)) = false; // hide cursor
+		*(bool*)(ReplicantHook::_baseAddress + enableInput) = true;  // enable game input
+		*(bool*)(ReplicantHook::_baseAddress + showCursor) = false; // hide cursor
 	}
 }
 
 void ReplicantHook::forceEndgameStats(bool enabled) {
-	(*(bool*)(ReplicantHook::_baseAddress + playerEndgame)) = true; // playerEndgame in main.cpp
+	*(bool*)(ReplicantHook::_baseAddress + playerEndgame) = true; // playerEndgame in main.cpp
 }
 
 void ReplicantHook::forceCharSelect(int character) {
-	(*(int*)(ReplicantHook::_baseAddress + currentCharacter)) = character;
+	*(int*)(ReplicantHook::_baseAddress + currentCharacter) = character;
 }
 
 // dev functions
@@ -452,7 +452,7 @@ void ReplicantHook::onConfigLoad(const utils::Config& cfg) {
 
 	infiniteMagic_toggle = cfg.get<bool>("infiniteMagicToggle").value_or(false);
 	infiniteMagic(infiniteMagic_toggle);
-};
+}
 
 void ReplicantHook::onConfigSave(utils::Config& cfg) {
 	cfg.set<bool>("cursorForceHiddenToggle", cursorForceHidden_toggle);
@@ -467,4 +467,4 @@ void ReplicantHook::onConfigSave(utils::Config& cfg) {
 	cfg.set<bool>("infiniteMagicToggle", infiniteMagic_toggle);
 
 	cfg.save(cfgString);
-};
+}

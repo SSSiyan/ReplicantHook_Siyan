@@ -249,13 +249,15 @@ DWORD WINAPI MainThread(LPVOID lpReserved) {
 			ExitProcess(0);
 		}
 	}
+
 	// look for memory leaks
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	// wait for game to load
-	// Sleep(10000);
+	// Sleep(5000);
+
 	// init imgui
 	g_D3D11Hook = std::make_unique<RHook::D3D11Hook>(&g_HookMonitorMutex);
-
 	g_D3D11Hook->OnPrePresent([&](RHook::DXGIHook&) { hkPresent(g_D3D11Hook.get()); });
 	g_D3D11Hook->OnPreResizeBuffers([&](RHook::DXGIHook&) { hkResizeBuffers(g_D3D11Hook.get()); });
 
@@ -270,10 +272,11 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
 	if (RHook::IsHelperProcess()) {
 		return TRUE;
 	}
+
 	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
 #ifndef NDEBUG
-		//MessageBox(NULL, "Debug attach opportunity", "Debug", MB_ICONINFORMATION);
+		// MessageBox(NULL, "Debug attach opportunity", "Debug", MB_ICONINFORMATION);
 #endif
 		DisableThreadLibraryCalls(hMod);
 		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
@@ -281,5 +284,6 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
 	case DLL_PROCESS_DETACH:
 		break;
 	}
+
 	return TRUE;
 }

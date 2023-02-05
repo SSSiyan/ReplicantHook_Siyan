@@ -296,7 +296,7 @@ void ReplicantHook::gameGui(void) {
 			static std::array<ImGuiURL, 5> links2{
 				ImGuiURL { "Dear ImGui", "https://github.com/ocornut/imgui" },
 				ImGuiURL { "RHook", "https://github.com/amir-120/RHook" },
-				ImGuiURL { "Microsoft Detours", "https://github.com/microsoft/Detours" },
+				ImGuiURL { "Detours", "https://github.com/microsoft/Detours" },
 				ImGuiURL { "libffi", "https://github.com/libffi/libffi" },
 				ImGuiURL { "spdlog", "https://github.com/gabime/spdlog" },
 			};
