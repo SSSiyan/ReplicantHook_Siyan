@@ -13,10 +13,13 @@ public:
 	void					   OnFrame()		override; // Must define this function but can be empty and do nothing
 	void					   OnDrawUi()		override; // Must define this function but can be empty and do nothing
 	void					   OnDestroy()		override; // Must define this function but can be empty and do nothing
-	bool					   IsInitialized()	override // Must define this function but can be empty and do nothing
+	bool					   IsInitialized()	override  // Must define this function but can be empty and do nothing
 	{
 		return m_IsInitialized;
 	}
+
+	void					   OnConfigSave()	override; // Must define this function but can be empty and do nothing
+	void					   OnConfigLoad()	override; // Must define this function but can be empty and do nothing
 
 private:
 	bool m_IsInitialized = false;

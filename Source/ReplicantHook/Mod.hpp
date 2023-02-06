@@ -18,6 +18,9 @@ public:
 	virtual void OnDestroy() = 0;
 	virtual bool IsInitialized() = 0;
 
+	virtual void OnConfigSave() = 0;
+	virtual void OnConfigLoad() = 0;
+
 	const auto& GetName() { return m_Name; }
 	void SetName(std::string name) { m_Name = name; }
 

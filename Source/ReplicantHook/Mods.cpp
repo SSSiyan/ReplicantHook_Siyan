@@ -54,3 +54,17 @@ std::shared_ptr<Mod> Mods::GetMod(std::string name)
 
     return nullptr;
 }
+
+void Mods::OnConfigSave()
+{
+	for (auto& mod : s_Mods) {
+		mod->OnConfigSave();
+	}
+}
+
+void Mods::OnConfigLoad()
+{
+	for (auto& mod : s_Mods) {
+		mod->OnConfigLoad();
+	}
+}

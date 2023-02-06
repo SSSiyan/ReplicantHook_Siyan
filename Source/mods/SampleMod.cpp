@@ -40,6 +40,16 @@ void SampleMod::OnDestroy()
 	// Gets executed when the mod object is destroyed or can be manually called before that
 }
 
+void SampleMod::OnConfigSave()
+{
+	// Save the state
+}
+
+void SampleMod::OnConfigLoad()
+{
+	// Load the state
+}
+
 // Mod specific logic
 extern "C" {
 	// Detour #1

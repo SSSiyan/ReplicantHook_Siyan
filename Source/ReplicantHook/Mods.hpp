@@ -19,6 +19,9 @@ public:
 	static std::shared_ptr<Mod> GetMod(std::string name);
 	static bool IsInitialized() { return m_IsInitialized; }
 
+	static void OnConfigSave();
+	static void OnConfigLoad();
+
 protected:
 	Mods();
 	~Mods();
