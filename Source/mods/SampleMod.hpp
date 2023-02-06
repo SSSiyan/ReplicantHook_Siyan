@@ -29,8 +29,13 @@ private:
 
 	std::unique_ptr<utility::Detour_t> m_Detour1{}, m_Detour2{};
 	
+	// Bools for the ui
+
 	bool m_LastDetour1Enabled = false;
 	bool m_Detour1Enabled = false;
+
+	bool m_LastDetour2Enabled = false;
+	bool m_Detour2Enabled = false;
 
 	bool InitializeDetour1();
 	bool InitializeDetour2();

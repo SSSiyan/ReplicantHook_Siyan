@@ -32,6 +32,15 @@ void SampleMod::OnDrawUI()
 	if (m_LastDetour1Enabled != m_Detour1Enabled) {
 		m_Detour1->Toggle(m_Detour1Enabled);
 	}
+
+	ImGui::Checkbox("SampleMode::Detour2", &m_Detour2Enabled);
+
+	if (m_LastDetour2Enabled != m_Detour2Enabled) {
+		m_Detour2->Toggle(m_Detour2Enabled);
+	}
+
+	m_LastDetour1Enabled = m_Detour1Enabled;
+	m_LastDetour2Enabled = m_Detour2Enabled;
 }
 
 void SampleMod::OnDestroy()
@@ -63,28 +72,20 @@ extern "C" {
 	// Detour #1
 	void* g_SampleMod_ReturnAddr1 = nullptr;
 	void SampleModDetour1();
-	bool shouldSampleModWork = true;
 
 	// Detour #2
 	void* g_SampleMod_ReturnAddr2 = nullptr;
 	void SampleModDetour2();
-
 }
 
-// main.cpp ReplicantHook::sampleMod1Init = InitializeDetour1();
 bool SampleMod::InitializeDetour1()
 {
-	/*
-	ReplicantHook::_nop((char*)(ReplicantHook::_baseAddress + 0x6C28D8), 7); // nop addr
-	void* aobToReplaceAddr = (void*)(ReplicantHook::_baseAddress + 0x6C28D8); // detour addr
-	void* detourAddr = &SampleModDetour1;
-	g_Detour1 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr);
-	void* detour1Success = g_Detour1->Create();
-	g_SampleMod_ReturnAddr1 = (void*)(ReplicantHook::_baseAddress + 0x6C28DF); // ret addr
-	*/
+	void* aobToReplaceAddr = nullptr; // The address you want to put your code in
+	void* detourAddr = &SampleModDetour1; // The address of your detour function
 
-	void* detour1Success = nullptr;
-	return detour1Success != nullptr ? true : false;
+	m_Detour1 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr, &g_SampleMod_ReturnAddr1);
+
+	return m_Detour1->IsEnabled();
 }
 
 bool SampleMod::InitializeDetour2()
@@ -92,8 +93,7 @@ bool SampleMod::InitializeDetour2()
 	void* aobToReplaceAddr = nullptr; // The address you want to put your code in
 	void* detourAddr = &SampleModDetour2; // The address of your detour function
 
-	m_Detour2 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr);
-	g_SampleMod_ReturnAddr2 = m_Detour2->Create();
+	m_Detour2 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr, &g_SampleMod_ReturnAddr2);
 
-	return g_SampleMod_ReturnAddr2 != nullptr ? true : false;
+	return m_Detour2->IsEnabled();
 }
