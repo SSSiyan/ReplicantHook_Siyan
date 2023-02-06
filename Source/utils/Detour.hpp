@@ -9,32 +9,64 @@ namespace utility {
 		Detour_t(void* target, void* destination);
 		~Detour_t();
 
+		/*
+		* Returns the address of where the detour should be placed
+		*/
 		const auto& GetOriginal()		const { return m_Original; }
-		const auto& GetDestination()	const { return m_Destination; }
-		const auto& GetTrampoline()		const { return m_Trampoline; }
-		
-		const auto& IsEnabled()			const { return m_IsEnabled; }
-		const auto& IsValid()			const { return m_IsValid; }
 
 		/*
-		* Returns the address to the original code (Trampoline)
+		* Returns the address of the code the detour wouldl jump to
+		*/
+		const auto& GetDestination()	const { return m_Destination; }
+
+		/*
+		* Returns the address of a copy of the original code that has been replaced by the detour jump
+		*/
+		const auto& GetTrampoline()		const { return m_Trampoline; }
+
+		/*
+		* Returns a bool that indicates the state of the detour whether if the target and destination are set (true) or not (false)
+		*/
+		auto IsValid()					const { return m_Original != nullptr && m_Destination != nullptr; }
+
+		/*
+		* Returns a bool that indicates the state of the detour whether if the detour is in place (true) or not (false)
+		*/
+		auto IsEnabled()				const { return m_Trampoline != nullptr; }
+
+		/*
+		* Places the detour in place and returns the address to the original code (Trampoline)
 		*/
 		void*		Create();
+
 		/*
-		* Returns the aob address address offset by the value passed to it
+		* Places the detour in place and returns the aob address offset by the value passed to it (In bytes)
 		*/
 		void*		Create(int64_t offset);
+		
+		/*
+		* Checks if the detour is valid automatically internally and returns a bool
+		* which indicates whether the remove operation was successful or not, if the detour
+		* was never created using the Create() method, the return value would be true
+		*/
 		bool		Remove();
 
+		/*
+		* Calls Create() if the detour is not in place (Is disabled) or
+		* calls Remove() if the detour is already in place (Is enabled)
+		* returns the current state of the hook after enabling (true) or disabling (false) it
+		*/
 		bool		Toggle();
+
+		/*
+		* Takes a bool and enables (true) or disables (false) the detour based on that
+		* returns the current state of the hook after enabling (true) or disabling (false) it
+		*/
 		bool		Toggle(bool state);
 
 	private:
 		void* m_Original{ nullptr };
 		void* m_Destination{ nullptr };
 		void* m_Trampoline{ nullptr };
-
-		bool m_IsEnabled{ false };
-		bool m_IsValid{ false };
 	};
 }

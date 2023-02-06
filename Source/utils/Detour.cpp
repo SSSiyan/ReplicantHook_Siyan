@@ -19,7 +19,7 @@ namespace utility {
 
 	void* Detour_t::Create()
 	{
-		if (m_IsValid && m_IsEnabled && m_Trampoline != nullptr) {
+		if (m_Trampoline != nullptr) {
 			return m_Trampoline;
 		}
 
@@ -47,9 +47,6 @@ namespace utility {
 			return nullptr;
 		};
 
-		m_IsEnabled = true;
-		m_IsValid = true;
-
 		return m_Trampoline;
 	}
 
@@ -63,10 +60,6 @@ namespace utility {
 
 	bool Detour_t::Remove()
 	{
-		if (m_IsEnabled == false) {
-			return true;
-		}
-
 		if (m_Original == nullptr || m_Destination == nullptr || m_Trampoline == nullptr) {
 			return false;
 		}
@@ -92,15 +85,14 @@ namespace utility {
 		};
 		
 		m_Trampoline = nullptr;
-		m_IsValid = false;
-		m_IsEnabled = false;
 
 		return true;
 	}
 
 	bool Detour_t::Toggle()
 	{
-		return Toggle(!m_IsEnabled);
+		bool isEnabled = m_Trampoline != nullptr;
+		return Toggle(!isEnabled);
 	}
 
 	bool Detour_t::Toggle(bool state)
@@ -110,7 +102,7 @@ namespace utility {
 		else
 			Remove();
 
-		return m_IsEnabled;
+		return IsEnabled();
 	}
 
 }

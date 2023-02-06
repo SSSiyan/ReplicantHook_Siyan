@@ -37,6 +37,15 @@ void SampleMod::OnDrawUI()
 void SampleMod::OnDestroy()
 {
 	// Gets executed when the mod object is destroyed or can be manually called before that
+
+	// Detour::Remove() checks if the detour is valid automatically internally and returns a bool
+	// which indicates whether the remove operation was successful or not
+	if (m_Detour1->Remove()) {
+		printf("Well fuck, failed to remove SampleMod::m_Detour1!");
+	}
+	if (m_Detour2->Remove()) {
+		printf("Well fuck, failed to remove SampleMod::m_Detour1!");
+	}
 }
 
 void SampleMod::OnConfigSave(utils::Config& config)
