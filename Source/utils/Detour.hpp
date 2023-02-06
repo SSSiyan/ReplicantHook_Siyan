@@ -6,33 +6,39 @@ namespace utility {
 	class Detour_t {
 	public:
 		Detour_t(uintptr_t target, uintptr_t destination);
+		Detour_t(uintptr_t target, uintptr_t destination, void** ppOriginalCodeReturn);
+		Detour_t(uintptr_t target, uintptr_t destination, void** ppReturn, int64_t offsetFromDetour);
+
 		Detour_t(void* target, void* destination);
+		Detour_t(void* target, void* destination, void** ppOriginalCodeReturn);
+		Detour_t(void* target, void* destination, void** ppReturn, int64_t offsetFromDetour);
+
 		~Detour_t();
 
 		/*
 		* Returns the address of where the detour should be placed
 		*/
-		const auto& GetOriginal()		const { return m_Original; }
+		const auto& GetOriginal() const { return m_Original; }
 
 		/*
 		* Returns the address of the code the detour wouldl jump to
 		*/
-		const auto& GetDestination()	const { return m_Destination; }
+		const auto& GetDestination() const { return m_Destination; }
 
 		/*
 		* Returns the address of a copy of the original code that has been replaced by the detour jump
 		*/
-		const auto& GetTrampoline()		const { return m_Trampoline; }
+		const auto& GetTrampoline() const { return m_Trampoline; }
 
 		/*
 		* Returns a bool that indicates the state of the detour whether if the target and destination are set (true) or not (false)
 		*/
-		auto IsValid()					const { return m_Original != nullptr && m_Destination != nullptr; }
+		auto IsValid() const { return m_Original != nullptr && m_Destination != nullptr; }
 
 		/*
 		* Returns a bool that indicates the state of the detour whether if the detour is in place (true) or not (false)
 		*/
-		auto IsEnabled()				const { return m_Trampoline != nullptr; }
+		auto IsEnabled() const { return m_Trampoline != nullptr; }
 
 		/*
 		* Places the detour in place and returns the address to the original code (Trampoline)

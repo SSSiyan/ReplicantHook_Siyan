@@ -8,9 +8,33 @@ namespace utility {
 		: m_Original((void*)target), m_Destination((void*)destination)
 	{}
 
+	Detour_t::Detour_t(uintptr_t target, uintptr_t destination, void** ppOriginalCodeReturn)
+		: m_Original((void*)target), m_Destination((void*)destination)
+	{
+		*ppOriginalCodeReturn = Create();
+	}
+
+	Detour_t::Detour_t(uintptr_t target, uintptr_t destination, void** ppReturn, int64_t offsetFromDetour)
+		: m_Original((void*)target), m_Destination((void*)destination)
+	{
+		*ppReturn = Create(offsetFromDetour);
+	}
+
 	Detour_t::Detour_t(void* target, void* destination)
 		: m_Original(target), m_Destination(destination)
 	{}
+
+	Detour_t::Detour_t(void* target, void* destination, void** ppOriginalCodeReturn)
+		: m_Original(target), m_Destination(destination)
+	{
+		*ppOriginalCodeReturn = Create();
+	}
+
+	Detour_t::Detour_t(void* target, void* destination, void** ppReturn, int64_t offsetFromDetour)
+		: m_Original(target), m_Destination(destination)
+	{
+		*ppReturn = Create(offsetFromDetour);
+	}
 
 	Detour_t::~Detour_t()
 	{
