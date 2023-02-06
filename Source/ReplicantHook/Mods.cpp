@@ -45,7 +45,7 @@ std::optional<std::string> Mods::Initialize()
 std::shared_ptr<Mod> Mods::GetMod(std::string name)
 {
 	if (m_NameToModMap.find(name) != m_NameToModMap.end())
-		return m_NameToModMap.at(name);
+		return m_NameToModMap.at(name).lock();
 
 	return {};
 }

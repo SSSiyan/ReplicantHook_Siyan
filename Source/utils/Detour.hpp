@@ -37,32 +37,32 @@ namespace utility {
 		/*
 		* Places the detour in place and returns the address to the original code (Trampoline)
 		*/
-		void*		Create();
+		void* Create();
 
 		/*
 		* Places the detour in place and returns the aob address offset by the value passed to it (In bytes)
 		*/
-		void*		Create(int64_t offset);
+		void* Create(int64_t offset);
 		
 		/*
 		* Checks if the detour is valid automatically internally and returns a bool
 		* which indicates whether the remove operation was successful or not, if the detour
 		* was never created using the Create() method, the return value would be true
 		*/
-		bool		Remove();
+		bool Remove();
 
 		/*
 		* Calls Create() if the detour is not in place (Is disabled) or
 		* calls Remove() if the detour is already in place (Is enabled)
 		* returns the current state of the hook after enabling (true) or disabling (false) it
 		*/
-		bool		Toggle();
+		bool Toggle();
 
 		/*
 		* Takes a bool and enables (true) or disables (false) the detour based on that
 		* returns the current state of the hook after enabling (true) or disabling (false) it
 		*/
-		bool		Toggle(bool state);
+		bool Toggle(bool state);
 
 	private:
 		void* m_Original{ nullptr };

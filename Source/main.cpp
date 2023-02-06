@@ -172,7 +172,7 @@ void InitHook() {
 		}
 	}
 	
-	if (const auto sampleMod = Mods::GetInstance()->GetMod("SampleMod"); sampleMod) {
+	if (const auto sampleMod = Mods::GetInstance()->GetMod("SampleMod")) {
 		ReplicantHook::sampleMod1Init = sampleMod->IsInitialized();
 	}
 }

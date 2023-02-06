@@ -34,7 +34,7 @@ protected:
 	void Setup();
 
 	std::vector<std::shared_ptr<Mod>> m_Mods{};
-	std::unordered_map<std::string, std::shared_ptr<Mod>> m_NameToModMap{};
+	std::unordered_map<std::string, std::weak_ptr<Mod>> m_NameToModMap{};
 	inline static Mods* s_Instance{};
 	bool m_IsInitialized{ false };
 };
