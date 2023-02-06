@@ -29,10 +29,10 @@ void Mods::Setup()
 		m_NameToModMap[mod->GetName()] = mod;
 }
 
-std::optional<std::string> Mods::Initialize()
+std::string Mods::Initialize()
 {
 	for (auto& mod : m_Mods) {
-        if (const auto err = mod->OnInitialize(); err.has_value()) {
+        if (const auto err = mod->OnInitialize(); !err.empty()) {
             m_IsInitialized = false;
             return err;
         }

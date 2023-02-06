@@ -10,11 +10,11 @@ public:
 		: Mod("SampleMod") // Name of the mod here
 	{}
 
-	std::optional<std::string> OnInitialize()	override; // Must define this function but can be empty and do nothing
-	void					   OnFrame()		override; // Must define this function but can be empty and do nothing
-	void					   OnDrawUI()		override; // Must define this function but can be empty and do nothing
-	void					   OnDestroy()		override; // Must define this function but can be empty and do nothing
-	bool					   IsInitialized()	override  // Must define this function but can be empty and do nothing
+	std::string	OnInitialize()	override; // Must define this function but can be empty and do nothing
+	void		OnFrame()		override; // Must define this function but can be empty and do nothing
+	void		OnDrawUI()		override; // Must define this function but can be empty and do nothing
+	void		OnDestroy()		override; // Must define this function but can be empty and do nothing
+	bool		IsInitialized()	override  // Must define this function but can be empty and do nothing
 	{
 		return m_IsInitialized;
 	}

@@ -1,5 +1,4 @@
 #pragma once
-#include <optional>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -16,7 +15,7 @@ public:
 
     static Mods* GetInstance();
 	
-	std::optional<std::string> Initialize();
+	std::string Initialize();
 	std::shared_ptr<Mod> GetMod(std::string name);
 	bool IsInitialized() { return m_IsInitialized; }
 

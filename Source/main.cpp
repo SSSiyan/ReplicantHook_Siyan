@@ -166,9 +166,10 @@ void InitHook() {
 
 	// init mods if they are not initialized yet (can be done on another thread)
 	if (!Mods::GetInstance()->IsInitialized()) {
-		if (auto err = Mods::GetInstance()->Initialize(); err.has_value())
+		if (auto err = Mods::GetInstance()->Initialize(); !err.empty())
 		{
-			printf("%s\n", err.value().c_str());
+			printf("%s\n", err.c_str());
+			return; // We failed like a bitch, we don't continue
 		}
 	}
 	

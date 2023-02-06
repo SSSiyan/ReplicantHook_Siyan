@@ -1,7 +1,7 @@
 #include "SampleMod.hpp"
 #include "../imgui/imgui.h"
 
-std::optional<std::string> SampleMod::OnInitialize()
+std::string SampleMod::OnInitialize()
 {
 	// Code that gets executed ones on creation goes here
 
@@ -15,7 +15,7 @@ std::optional<std::string> SampleMod::OnInitialize()
 
 	m_LastDetour1Enabled = m_Detour1Enabled;
 
-	return {}; // We return the error as a string or if no error we return "{}"
+	return {}; // We return the error as a string or if no error we return an empty string "{}"
 }
 
 void SampleMod::OnFrame()

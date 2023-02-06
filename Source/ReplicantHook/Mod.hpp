@@ -1,7 +1,6 @@
 #pragma once
 #include "../utils/config.hpp"
 #include <vector>
-#include <optional>
 #include <string>
 
 class Mod {
@@ -12,7 +11,7 @@ public:
 
 	~Mod() = default;
 
-	virtual std::optional<std::string> OnInitialize() = 0;
+	virtual std::string OnInitialize() = 0;
 	virtual void OnFrame() = 0;
 	virtual void OnDrawUI() = 0;
 	virtual void OnDestroy() = 0;
