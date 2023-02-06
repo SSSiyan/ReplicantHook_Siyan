@@ -1,5 +1,6 @@
 #pragma once
 #include <vadefs.h>
+#include <stdint.h>
 
 namespace utility {
 	class Detour_t {
