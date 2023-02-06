@@ -26,21 +26,23 @@ void SampleMod::OnFrame()
 void SampleMod::OnDrawUI()
 {
 	// UI Code here
+	if (m_IsInitialized) {
+		m_Detour1Enabled = m_Detour1->IsEnabled(); // We put this here so that the "m_Detour1Enabled" variable is updated before drawing each frame
+		m_Detour2Enabled = m_Detour2->IsEnabled(); // Same deal
 
-	ImGui::Checkbox("SampleMode::Detour1", &m_Detour1Enabled);
-	
-	if (m_LastDetour1Enabled != m_Detour1Enabled) {
-		m_Detour1->Toggle(m_Detour1Enabled);
+		ImGui::Checkbox("SampleMode::Detour1", &m_Detour1Enabled);
+		if (m_LastDetour1Enabled != m_Detour1Enabled) { // If the state changed we toggle the mod based on the new state as well
+			m_Detour1Enabled = m_Detour1->Toggle(m_Detour1Enabled); // We assign the result of Toggle() to m_Detour1Enabled just to make sure it has the correct value even if Toggle() failed
+		}
+
+		ImGui::Checkbox("SampleMode::Detour2", &m_Detour2Enabled);
+		if (m_LastDetour2Enabled != m_Detour2Enabled) {
+			m_Detour2Enabled = m_Detour2->Toggle(m_Detour2Enabled);
+		}
+
+		m_LastDetour1Enabled = m_Detour1Enabled;
+		m_LastDetour2Enabled = m_Detour2Enabled;
 	}
-
-	ImGui::Checkbox("SampleMode::Detour2", &m_Detour2Enabled);
-
-	if (m_LastDetour2Enabled != m_Detour2Enabled) {
-		m_Detour2->Toggle(m_Detour2Enabled);
-	}
-
-	m_LastDetour1Enabled = m_Detour1Enabled;
-	m_LastDetour2Enabled = m_Detour2Enabled;
 }
 
 void SampleMod::OnDestroy()
@@ -83,9 +85,9 @@ bool SampleMod::InitializeDetour1()
 	void* aobToReplaceAddr = nullptr; // The address you want to put your code in
 	void* detourAddr = &SampleModDetour1; // The address of your detour function
 
-	m_Detour1 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr, &g_SampleMod_ReturnAddr1);
+	m_Detour1 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr);
 
-	return m_Detour1->IsEnabled();
+	return m_Detour1->IsValid();
 }
 
 bool SampleMod::InitializeDetour2()
@@ -93,7 +95,7 @@ bool SampleMod::InitializeDetour2()
 	void* aobToReplaceAddr = nullptr; // The address you want to put your code in
 	void* detourAddr = &SampleModDetour2; // The address of your detour function
 
-	m_Detour2 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr, &g_SampleMod_ReturnAddr2);
+	m_Detour2 = std::make_unique<utility::Detour_t>(aobToReplaceAddr, detourAddr);
 
-	return m_Detour2->IsEnabled();
+	return m_Detour2->IsValid();
 }
