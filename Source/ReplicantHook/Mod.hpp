@@ -1,5 +1,5 @@
 #pragma once
-#include "../utils/Detour.hpp"
+#include "../utils/config.hpp"
 #include <vector>
 #include <optional>
 #include <string>
@@ -14,12 +14,12 @@ public:
 
 	virtual std::optional<std::string> OnInitialize() = 0;
 	virtual void OnFrame() = 0;
-	virtual void OnDrawUi() = 0;
+	virtual void OnDrawUI() = 0;
 	virtual void OnDestroy() = 0;
 	virtual bool IsInitialized() = 0;
 
-	virtual void OnConfigSave() = 0;
-	virtual void OnConfigLoad() = 0;
+	virtual void OnConfigSave(utils::Config& config) = 0;
+	virtual void OnConfigLoad(const utils::Config& config) = 0;
 
 	const auto& GetName() { return m_Name; }
 	void SetName(std::string name) { m_Name = name; }

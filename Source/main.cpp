@@ -162,14 +162,19 @@ void InitHook() {
 
 	// load settings, must happen after hook
 	ReplicantHook::onConfigLoad(ReplicantHook::cfg);
+	Mods::GetInstance()->LoadConfig(ReplicantHook::cfg);
 
-	// init detours
-	if (auto err = Mods::GetInstance()->Initialize(); err.has_value()) 
-	{
-		printf(err.value().c_str());
+	// init mods if they are not initialized yet (can be done on another thread)
+	if (!Mods::GetInstance()->IsInitialized()) {
+		if (auto err = Mods::GetInstance()->Initialize(); err.has_value())
+		{
+			printf("%s\n", err.value().c_str());
+		}
 	}
 	
-	ReplicantHook::sampleMod1Init = Mods::GetMod("SampleMod")->IsInitialized();
+	if (const auto sampleMod = Mods::GetInstance()->GetMod("SampleMod"); sampleMod) {
+		ReplicantHook::sampleMod1Init = sampleMod->IsInitialized();
+	}
 }
 
 std::unique_ptr<WindowsMessageHook> g_WindowsMessageHook{};
@@ -208,6 +213,10 @@ void __stdcall hkPresent(RHook::D3D11Hook* pd3d11Hook) {
 			return;
 	}
 
+	if (Mods::GetInstance()->IsInitialized()) {
+		Mods::GetInstance()->OnFrame();
+	}
+
 	// check process ID is valid
 	if (ReplicantHook::_pID != ReplicantHook::_getProcessID()) {
 		goto imgui_finish;
@@ -235,6 +244,7 @@ void __stdcall hkPresent(RHook::D3D11Hook* pd3d11Hook) {
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
 	ImGui::SetNextWindowSize(ImVec2(ReplicantHook::trainerWidth, ReplicantHook::trainerVariableHeight)), ImGuiCond_Always;
 	ImGui::Begin(ReplicantHook::dllName, NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Mods::GetInstance()->DrawUI();
 	ReplicantHook::gameGui();
 	ImGui::End();
 
@@ -278,6 +288,13 @@ DWORD WINAPI MainThread(LPVOID lpReserved) {
 	return TRUE;
 }
 
+void ShutDown() {
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+
+	Mods::GetInstance()->Destroy();
+}
+
 BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
 	if (RHook::IsHelperProcess()) {
 		return TRUE;
@@ -289,9 +306,10 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved) {
 		MessageBox(NULL, "Debug attach opportunity", "Debug", MB_ICONINFORMATION);
 #endif
 		DisableThreadLibraryCalls(hMod);
-		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+		CloseHandle(CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr));
 		break;
 	case DLL_PROCESS_DETACH:
+		ShutDown();
 		break;
 	}
 

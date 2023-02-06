@@ -1,25 +1,26 @@
 #pragma once
 #include "Mod.hpp"
+#include "../utils/Detour.hpp"
 #include <memory>
 
 class SampleMod : public Mod
 {
 public:
 	SampleMod()
-		: Mod("SampleName") // Name of the mod here
+		: Mod("SampleMod") // Name of the mod here
 	{}
 
 	std::optional<std::string> OnInitialize()	override; // Must define this function but can be empty and do nothing
 	void					   OnFrame()		override; // Must define this function but can be empty and do nothing
-	void					   OnDrawUi()		override; // Must define this function but can be empty and do nothing
+	void					   OnDrawUI()		override; // Must define this function but can be empty and do nothing
 	void					   OnDestroy()		override; // Must define this function but can be empty and do nothing
 	bool					   IsInitialized()	override  // Must define this function but can be empty and do nothing
 	{
 		return m_IsInitialized;
 	}
 
-	void					   OnConfigSave()	override; // Must define this function but can be empty and do nothing
-	void					   OnConfigLoad()	override; // Must define this function but can be empty and do nothing
+	void OnConfigSave(utils::Config& config)		override; // Must define this function but can be empty and do nothing
+	void OnConfigLoad(const utils::Config& config)	override; // Must define this function but can be empty and do nothing
 
 private:
 	bool m_IsInitialized = false;

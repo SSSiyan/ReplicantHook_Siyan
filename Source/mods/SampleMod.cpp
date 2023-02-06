@@ -1,5 +1,4 @@
 #include "SampleMod.hpp"
-#include "../utils/Detour.hpp"
 #include "../imgui/imgui.h"
 
 std::optional<std::string> SampleMod::OnInitialize()
@@ -21,10 +20,10 @@ std::optional<std::string> SampleMod::OnInitialize()
 
 void SampleMod::OnFrame()
 {
-	// Gets executed before drawing the ui
+	// Gets executed before drawing the ui and on all frames whether ui is drawn or not
 }
 
-void SampleMod::OnDrawUi()
+void SampleMod::OnDrawUI()
 {
 	// UI Code here
 
@@ -40,12 +39,12 @@ void SampleMod::OnDestroy()
 	// Gets executed when the mod object is destroyed or can be manually called before that
 }
 
-void SampleMod::OnConfigSave()
+void SampleMod::OnConfigSave(utils::Config& config)
 {
 	// Save the state
 }
 
-void SampleMod::OnConfigLoad()
+void SampleMod::OnConfigLoad(const utils::Config& config)
 {
 	// Load the state
 }

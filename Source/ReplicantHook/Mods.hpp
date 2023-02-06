@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include "../utils/config.hpp"
 
 #include "Mod.hpp"
 
@@ -15,12 +16,16 @@ public:
 
     static Mods* GetInstance();
 	
-	static std::optional<std::string> Initialize();
-	static std::shared_ptr<Mod> GetMod(std::string name);
-	static bool IsInitialized() { return m_IsInitialized; }
+	std::optional<std::string> Initialize();
+	std::shared_ptr<Mod> GetMod(std::string name);
+	bool IsInitialized() { return m_IsInitialized; }
 
-	static void OnConfigSave();
-	static void OnConfigLoad();
+	void OnFrame();
+	void DrawUI();
+	void Destroy();
+
+	void SaveConfig(utils::Config& config);
+	void LoadConfig(const utils::Config& config);
 
 protected:
 	Mods();
@@ -28,9 +33,9 @@ protected:
 
 	void Setup();
 
-	inline static std::vector<std::shared_ptr<Mod>> s_Mods{};
-	inline static std::unordered_map<std::string, std::shared_ptr<Mod>> s_NameToModMap{};
+	std::vector<std::shared_ptr<Mod>> m_Mods{};
+	std::unordered_map<std::string, std::shared_ptr<Mod>> m_NameToModMap{};
 	inline static Mods* s_Instance{};
-	inline static bool m_IsInitialized{ false };
+	bool m_IsInitialized{ false };
 };
 
