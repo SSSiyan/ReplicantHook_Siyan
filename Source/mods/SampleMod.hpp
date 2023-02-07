@@ -28,7 +28,8 @@ private:
 	// Mod specific data goes here
 
 	std::unique_ptr<utility::Detour_t> m_Detour1{}, m_Detour2{};
-	
+	const int64_t m_Detour1ReturnOffset = 7, m_Detour2ReturnOffset = -12165465465; // Offset of the code to jump to after the detour
+
 	// Bools for the ui
 
 	bool m_LastDetour1Enabled = false;
