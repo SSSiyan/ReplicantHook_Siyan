@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <shlobj_core.h>
 #include "LicenseStrings.hpp"
+#include "Mods.hpp"
 
 constexpr std::array<const char*, 5> characterNameStrings {
 	"Young Nier",		// 0
@@ -83,6 +84,8 @@ void ReplicantHook::gameGui(void) {
 			if (ImGui::Checkbox("Infinite Magic", &ReplicantHook::infiniteMagic_toggle)){
 				ReplicantHook::infiniteMagic(ReplicantHook::infiniteMagic_toggle);
 			}
+
+			Mods::GetInstance()->DrawUI();
 
 			ImGui::Separator();
 

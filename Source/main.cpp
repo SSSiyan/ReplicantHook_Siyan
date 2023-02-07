@@ -245,7 +245,6 @@ void __stdcall hkPresent(RHook::D3D11Hook* pd3d11Hook) {
 	ImGui::SetNextWindowPos(ImVec2(0, 0)), ImGuiCond_Always;
 	ImGui::SetNextWindowSize(ImVec2(ReplicantHook::trainerWidth, ReplicantHook::trainerVariableHeight)), ImGuiCond_Always;
 	ImGui::Begin(ReplicantHook::dllName, NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-	Mods::GetInstance()->DrawUI();
 	ReplicantHook::gameGui();
 	ImGui::End();
 
