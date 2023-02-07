@@ -97,8 +97,6 @@ namespace utility {
 			return false;
 		};
 
-		m_Trampoline = m_Original;
-
 		if (auto status = DetourDetach(&m_Trampoline, m_Destination); status != NO_ERROR) {
 			DetourTransactionCommit();
 			return false;
@@ -126,7 +124,7 @@ namespace utility {
 		else
 			Remove();
 
-		return IsEnabled();
+		return m_Trampoline != nullptr;
 	}
 
 }
