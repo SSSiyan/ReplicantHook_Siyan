@@ -79,21 +79,21 @@ void SampleMod::OnDrawUI()
 		ImGui::Checkbox("SampleMode::Detour1", &m_Detour1Enabled);
 		if (m_LastDetour1Enabled != m_Detour1Enabled) { // If the state changed we toggle the mod based on the new state as well
 			m_Detour1Enabled = m_Detour1->Toggle(m_Detour1Enabled); // We assign the result of Toggle() to m_Detour1Enabled just to make sure it has the correct value even if Toggle() failed
+
+			if (m_Detour1->IsEnabled()) {
+				// g_SampleMod_ReturnAddr1 = m_Detour1->GetTrampoline(); // If we want the return address to the original code
+				g_SampleMod_ReturnAddr1 = m_Detour1->GetReturnAddress(m_Detour1ReturnOffset); // If wewant the return address to an offset of the detour jump place (In this case 7 bytes after it)
+			}
 		}
 
 		ImGui::Checkbox("SampleMode::Detour2", &m_Detour2Enabled);
 		if (m_LastDetour2Enabled != m_Detour2Enabled) {
 			m_Detour2Enabled = m_Detour2->Toggle(m_Detour2Enabled);
-		}
 
-		if (m_Detour1->IsEnabled()) {
-			// g_SampleMod_ReturnAddr1 = m_Detour1->GetTrampoline(); // If we want the return address to the original code
-			g_SampleMod_ReturnAddr1 = m_Detour1->GetReturnAddress(m_Detour1ReturnOffset); // If wewant the return address to an offset of the detour jump place (In this case 7 bytes after it)
-		}
-
-		if (m_Detour2->IsEnabled()) {
-			// g_SampleMod_ReturnAddr2 = m_Detour2->GetTrampoline(); // If we want the return address to the original code
-			g_SampleMod_ReturnAddr2 = m_Detour2->GetReturnAddress(m_Detour2ReturnOffset); // If wewant the return address to an offset of the detour jump place (In this case 7 bytes after it)
+			if (m_Detour2->IsEnabled()) {
+				// g_SampleMod_ReturnAddr2 = m_Detour2->GetTrampoline();
+				g_SampleMod_ReturnAddr2 = m_Detour2->GetReturnAddress(m_Detour2ReturnOffset);
+			}
 		}
 
 		m_LastDetour1Enabled = m_Detour1Enabled;
