@@ -6,12 +6,12 @@ namespace utility {
 	class Detour_t {
 	public:
 		Detour_t(uintptr_t target, uintptr_t destination);
-		Detour_t(uintptr_t target, uintptr_t destination, void** ppOriginalCodeReturn);
-		Detour_t(uintptr_t target, uintptr_t destination, void** ppReturn, int64_t offsetFromDetour);
+		Detour_t(uintptr_t target, uintptr_t destination, uintptr_t* pOriginalCodeReturn);
+		Detour_t(uintptr_t target, uintptr_t destination, uintptr_t* ppReturn, int64_t offsetFromDetour);
 
 		Detour_t(void* target, void* destination);
-		Detour_t(void* target, void* destination, void** ppOriginalCodeReturn);
-		Detour_t(void* target, void* destination, void** ppReturn, int64_t offsetFromDetour);
+		Detour_t(void* target, void* destination, void** pOriginalCodeReturn);
+		Detour_t(void* target, void* destination, void** pReturn, int64_t offsetFromDetour);
 
 		~Detour_t();
 
@@ -29,6 +29,11 @@ namespace utility {
 		* Returns the address of a copy of the original code that has been replaced by the detour jump
 		*/
 		const auto& GetTrampoline() const { return m_Trampoline; }
+
+		/*
+		* Returns the return address by offset from the detour
+		*/
+		void* GetReturnAddress(int64_t offset) { return (void*)((uintptr_t)m_Original + offset); };
 
 		/*
 		* Returns a bool that indicates the state of the detour whether if the target and destination are set (true) or not (false)

@@ -8,32 +8,32 @@ namespace utility {
 		: m_Original((void*)target), m_Destination((void*)destination)
 	{}
 
-	Detour_t::Detour_t(uintptr_t target, uintptr_t destination, void** ppOriginalCodeReturn)
+	Detour_t::Detour_t(uintptr_t target, uintptr_t destination, uintptr_t* pOriginalCodeReturn)
 		: m_Original((void*)target), m_Destination((void*)destination)
 	{
-		*ppOriginalCodeReturn = Create();
+		*pOriginalCodeReturn = (uintptr_t)Create();
 	}
 
-	Detour_t::Detour_t(uintptr_t target, uintptr_t destination, void** ppReturn, int64_t offsetFromDetour)
+	Detour_t::Detour_t(uintptr_t target, uintptr_t destination, uintptr_t* pReturn, int64_t offsetFromDetour)
 		: m_Original((void*)target), m_Destination((void*)destination)
 	{
-		*ppReturn = Create(offsetFromDetour);
+		*pReturn = (uintptr_t)Create(offsetFromDetour);
 	}
 
 	Detour_t::Detour_t(void* target, void* destination)
 		: m_Original(target), m_Destination(destination)
 	{}
 
-	Detour_t::Detour_t(void* target, void* destination, void** ppOriginalCodeReturn)
+	Detour_t::Detour_t(void* target, void* destination, void** pOriginalCodeReturn)
 		: m_Original(target), m_Destination(destination)
 	{
-		*ppOriginalCodeReturn = Create();
+		*pOriginalCodeReturn = Create();
 	}
 
-	Detour_t::Detour_t(void* target, void* destination, void** ppReturn, int64_t offsetFromDetour)
+	Detour_t::Detour_t(void* target, void* destination, void** pReturn, int64_t offsetFromDetour)
 		: m_Original(target), m_Destination(destination)
 	{
-		*ppReturn = Create(offsetFromDetour);
+		*pReturn = Create(offsetFromDetour);
 	}
 
 	Detour_t::~Detour_t()
